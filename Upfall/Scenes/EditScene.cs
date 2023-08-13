@@ -45,6 +45,16 @@ public class EditScene : Scene
             _player.Position = pos;
             _player.Velocity = Vector2.Zero;
         }
+
+        if (InputManager.GetKeyDown(Keys.LeftControl) && InputManager.GetKeyPress(Keys.S))
+        {
+            _tilemap.SaveToFile("map.umd");
+        }
+        
+        if (InputManager.GetKeyDown(Keys.LeftControl) && InputManager.GetKeyPress(Keys.O))
+        {
+            _tilemap.LoadFromFile("map.umd");
+        }
     }
 
     public override void CanvasRender(SpriteBatch spriteBatch)
