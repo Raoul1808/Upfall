@@ -1,4 +1,3 @@
-using System;
 using Brocco;
 using Brocco.Input;
 using Microsoft.Xna.Framework;
@@ -8,6 +7,8 @@ namespace Upfall.Entities;
 
 internal class Player : Entity
 {
+    private Vector2 _velocity;
+    
     public Player()
     {
         CurrentTexture = Assets.GetTexture("player");
@@ -15,21 +16,22 @@ internal class Player : Entity
     
     public override void Update(float dt)
     {
-        Vector2 vel = Vector2.Zero;
-        
-        if (InputManager.GetKeyDown(Keys.Z))
-            vel.Y--;
-        if (InputManager.GetKeyDown(Keys.S))
-            vel.Y++;
-        if (InputManager.GetKeyDown(Keys.Q))
-            vel.X--;
-        if (InputManager.GetKeyDown(Keys.D))
-            vel.X++;
-        
-        if (vel != Vector2.Zero)
-            vel.Normalize();
-        Position += vel;
+        bool left = InputManager.GetKeyDown(Keys.Left) || InputManager.GetButtonDown(Buttons.LeftThumbstickLeft);
+        bool right = InputManager.GetKeyDown(Keys.Right) || InputManager.GetButtonDown(Buttons.LeftThumbstickRight);
+        bool jump = InputManager.GetKeyDown(Keys.Space) || InputManager.GetButtonDown(Buttons.A);
 
-        Console.WriteLine("I am at " + Position);
+        if (left)
+            _velocity.X = -5f;
+        if (right)
+            _velocity.X = 5f;
+        if (left == right)
+            _velocity.X = 0;
+
+        _velocity.Y += 0.25f;
+
+        if (jump)
+            _velocity.Y = -10f;
+
+        Position += _velocity;
     }
 }
