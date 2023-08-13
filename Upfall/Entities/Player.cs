@@ -1,6 +1,7 @@
 using Brocco;
 using Brocco.Input;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Upfall.Entities;
@@ -11,12 +12,11 @@ internal class Player : Entity
     private const float Gravity = 20f;
     private const float HorizontalSpeed = 5f;
     private const float JumpForce = 7f;
-
-    private Vector2 _velocity;
     
     public Player()
     {
         CurrentTexture = Assets.GetTexture("player");
+        Position = new Vector2(100, 100);
     }
     
     public override void Update(float dt)
@@ -26,19 +26,44 @@ internal class Player : Entity
         bool jump = InputManager.GetKeyPress(Keys.Space) || InputManager.GetButtonPress(Buttons.A);
 
         if (left)
-            _velocity.X = -HorizontalSpeed;
+            Velocity.X = -HorizontalSpeed;
         if (right)
-            _velocity.X = HorizontalSpeed;
+            Velocity.X = HorizontalSpeed;
         if (left == right)
-            _velocity.X = 0;
+            Velocity.X = 0;
 
-        _velocity.Y += Gravity * dt;
-        if (_velocity.Y >= MaxFallSpeed)
-            _velocity.Y = MaxFallSpeed;
+        Velocity.Y += Gravity * dt;
+        if (Velocity.Y >= MaxFallSpeed)
+            Velocity.Y = MaxFallSpeed;
 
         if (jump)
-            _velocity.Y = -JumpForce;
+            Velocity.Y = -JumpForce;
+    }
 
-        Position += _velocity;
+    public void ResolveCollision(Entity other)
+    {
+        float halfWidth = BoundingBox.Width / 2f;
+        float halfHeight = BoundingBox.Height / 2f;
+        
+        if (this.TouchedLeftOf(other))
+        {
+            Position.X = other.BoundingBox.Left - halfWidth;
+            Velocity.X = 0;
+        }
+        if (this.TouchedRightOf(other))
+        {
+            Position.X = other.BoundingBox.Right + halfWidth;
+            Velocity.X = 0;
+        }
+        if (this.TouchedTopOf(other))
+        {
+            Position.Y = other.BoundingBox.Top - halfHeight;
+            Velocity.Y = 0;
+        }
+        if (this.TouchedBottomOf(other))
+        {
+            Position.Y = other.BoundingBox.Bottom + halfHeight;
+            Velocity.Y = 0;
+        }
     }
 }
