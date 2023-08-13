@@ -7,6 +7,11 @@ namespace Upfall.Entities;
 
 internal class Player : Entity
 {
+    private const float MaxFallSpeed = 40f;
+    private const float Gravity = 20f;
+    private const float HorizontalSpeed = 5f;
+    private const float JumpForce = 7f;
+
     private Vector2 _velocity;
     
     public Player()
@@ -18,19 +23,21 @@ internal class Player : Entity
     {
         bool left = InputManager.GetKeyDown(Keys.Left) || InputManager.GetButtonDown(Buttons.LeftThumbstickLeft);
         bool right = InputManager.GetKeyDown(Keys.Right) || InputManager.GetButtonDown(Buttons.LeftThumbstickRight);
-        bool jump = InputManager.GetKeyDown(Keys.Space) || InputManager.GetButtonDown(Buttons.A);
+        bool jump = InputManager.GetKeyPress(Keys.Space) || InputManager.GetButtonPress(Buttons.A);
 
         if (left)
-            _velocity.X = -5f;
+            _velocity.X = -HorizontalSpeed;
         if (right)
-            _velocity.X = 5f;
+            _velocity.X = HorizontalSpeed;
         if (left == right)
             _velocity.X = 0;
 
-        _velocity.Y += 0.25f;
+        _velocity.Y += Gravity * dt;
+        if (_velocity.Y >= MaxFallSpeed)
+            _velocity.Y = MaxFallSpeed;
 
         if (jump)
-            _velocity.Y = -10f;
+            _velocity.Y = -JumpForce;
 
         Position += _velocity;
     }
