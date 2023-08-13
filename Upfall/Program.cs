@@ -11,7 +11,7 @@ internal class Program
     {
         var game = new BroccoGame(new BroccoGameSettings
         {
-            CanvasSize = new Size(320, 180),
+            CanvasSize = new Size(640, 360),
             Resolution = new Size(1280, 720),
             ClearColor = Color.CornflowerBlue,
         });
