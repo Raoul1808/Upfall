@@ -14,8 +14,10 @@ internal class Program
             CanvasSize = new Size(640, 360),
             Resolution = new Size(1280, 720),
             ClearColor = Color.CornflowerBlue,
+            ShowMouse = true,
         });
-        
+
+        SceneManager.Add("Edit Scene", new EditScene());
         SceneManager.Add("Game Scene", new GameScene());
 
         game.Run();

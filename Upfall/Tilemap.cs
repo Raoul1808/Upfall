@@ -1,5 +1,6 @@
 using System;
 using Brocco;
+using Brocco.Basic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Upfall.Entities;
@@ -13,6 +14,16 @@ public class Tilemap
     public Tilemap(int[,] tiles)
     {
         _tiles = tiles;
+    }
+
+    public Tilemap(Size size)
+    {
+        _tiles = new int[size.Height, size.Width];
+    }
+
+    public void SetTile(Point pos, int tile)
+    {
+        _tiles[pos.Y, pos.X] = tile;
     }
     
     public const int TileSize = 16;
