@@ -1,12 +1,11 @@
 using Brocco;
 using Brocco.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Upfall.Entities;
 
-internal class Player : Entity
+public class Player : Entity
 {
     private const float MaxFallSpeed = 40f;
     private const float Gravity = 20f;
@@ -40,29 +39,29 @@ internal class Player : Entity
             Velocity.Y = -JumpForce;
     }
 
-    public void ResolveCollision(Entity other)
+    public void ResolveTileCollision(Rectangle other)
     {
         float halfWidth = BoundingBox.Width / 2f;
         float halfHeight = BoundingBox.Height / 2f;
         
         if (this.TouchedLeftOf(other))
         {
-            Position.X = other.BoundingBox.Left - halfWidth;
+            Position.X = other.Left - halfWidth;
             Velocity.X = 0;
         }
         if (this.TouchedRightOf(other))
         {
-            Position.X = other.BoundingBox.Right + halfWidth;
+            Position.X = other.Right + halfWidth;
             Velocity.X = 0;
         }
         if (this.TouchedTopOf(other))
         {
-            Position.Y = other.BoundingBox.Top - halfHeight;
+            Position.Y = other.Top - halfHeight;
             Velocity.Y = 0;
         }
         if (this.TouchedBottomOf(other))
         {
-            Position.Y = other.BoundingBox.Bottom + halfHeight;
+            Position.Y = other.Bottom + halfHeight;
             Velocity.Y = 0;
         }
     }
