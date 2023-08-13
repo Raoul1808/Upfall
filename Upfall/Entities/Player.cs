@@ -10,7 +10,7 @@ internal class Player : Entity
 {
     public Player()
     {
-        CurrentTexture = Assets.GetTexture("ok");
+        CurrentTexture = Assets.GetTexture("player");
     }
     
     public override void Update(float dt)
