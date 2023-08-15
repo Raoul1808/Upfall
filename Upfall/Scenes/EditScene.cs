@@ -36,6 +36,14 @@ public class EditScene : Scene
 
     public override void Update(float dt)
     {
+        if (InputManager.GetKeyPress(Keys.Escape))
+        {
+            // We want to go back to the main menu for now
+            // TODO: add editor menu metadata options thing
+            SceneManager.Change("Menu");
+            return;  // Don't execute further
+        }
+        
         if (InputManager.GetKeyPress(Keys.Tab))
             UpfallCommon.CycleWorldMode();
 
