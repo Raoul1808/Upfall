@@ -15,41 +15,67 @@ public class Tilemap
     private int[,] _tiles;
     private int[,] _darkTiles;
     private int[,] _lightTiles;
+    private Size _tilemapSize;
     private Point _spawnPoint;
     private Point _endPoint;
 
-    public Tilemap(int[,] tiles)
-    {
-        Size sz = new Size(tiles.GetLength(1), tiles.GetLength(0));
-        _tiles = tiles;
-        _darkTiles = new int[sz.Height, sz.Width];
-        _lightTiles = new int[sz.Height, sz.Width];
-    }
+    public Vector2 HalfTile => new(TileSize / 2f);
 
+    private Tilemap()
+    {
+    }
+    
     public Tilemap(Size size)
     {
+        _tilemapSize = size;
         _tiles = new int[size.Height, size.Width];
         _darkTiles = new int[size.Height, size.Width];
         _lightTiles = new int[size.Height, size.Width];
     }
 
-    public void SetTile(Point pos, int tile)
+    public void SetCommonTile(Point pos, int tile)
     {
         _tiles[pos.Y, pos.X] = tile;
     }
 
+    public void SetDarkTile(Point pos, int tile)
+    {
+        _darkTiles[pos.Y, pos.X] = tile;
+    }
+
+    public void SetLightTile(Point pos, int tile)
+    {
+        _lightTiles[pos.Y, pos.X] = tile;
+    }
+
+    public void SetSpawn(Point pos)
+    {
+        _spawnPoint = pos;
+    }
+
+    public void SetExit(Point pos)
+    {
+        _endPoint = pos;
+    }
+
+    public int GetTileCommon(int x, int y) => _tiles[y, x];
+
+    public int GetTileDark(int x, int y) => _darkTiles[y, x];
+
+    public int GetTileLight(int x, int y) => _lightTiles[y, x];
+
     public int GetTile(int x, int y)
     {
-        int tile = _tiles[y, x];
+        int tile = GetTileCommon(x, y);
         if (tile == 0)
         {
             switch (UpfallCommon.CurrentWorldMode)
             {
                 case WorldMode.Dark:
-                    return _darkTiles[y, x];
+                    return GetTileDark(x, y);
 
                 case WorldMode.Light:
-                    return _lightTiles[y, x];
+                    return GetTileLight(x, y);
                 
                 case WorldMode.None:
                 default:
@@ -60,41 +86,105 @@ public class Tilemap
         return tile;
     }
 
+    public Vector2 GetSpawnPos() => GetTilePos(_spawnPoint).ToVector2() + HalfTile;
+
+    public Point GetTilePos(Point pos) => new(pos.X * TileSize, pos.Y * TileSize);
+
+    public int GetLeft() => 0;
+    public int GetRight() => _tilemapSize.Width * TileSize;
+    public int GetTop() => 0;
+    public int GetBottom() => _tilemapSize.Height * TileSize;
+
     public Rectangle GetTileRect(Point pos) => GetTileRect(pos.X, pos.Y);
 
     public Rectangle GetTileRect(int x, int y) => new(x * TileSize, y * TileSize, TileSize, TileSize);
     
     public const int TileSize = 16;
 
-    public void LoadFromFile(string path)
+    public static Tilemap LoadFromFile(string path)
     {
         var reader = File.OpenText(path);
-        var rows = int.Parse(reader.ReadLine() ?? "0");
-        var cols = int.Parse(reader.ReadLine() ?? "0");
-        _tiles = new int[rows, cols];
-        for (int row = 0; row < _tiles.GetLength(0); row++)
+        var width = int.Parse(reader.ReadLine() ?? "0");
+        var height = int.Parse(reader.ReadLine() ?? "0");
+        var startX = int.Parse(reader.ReadLine() ?? "0");
+        var startY = int.Parse(reader.ReadLine() ?? "0");
+        var endX = int.Parse(reader.ReadLine() ?? "0");
+        var endY = int.Parse(reader.ReadLine() ?? "0");
+        var size = new Size(width, height);
+        var tiles = new int[height, width];
+        var darkTiles = new int[height, width];
+        var lightTiles = new int[height, width];
+        for (int row = 0; row < size.Height; row++)
         {
-            var line = reader.ReadLine() ?? new string('0', cols);
+            var line = reader.ReadLine() ?? new string('0', size.Width);
             
-            for (int col = 0; col < _tiles.GetLength(1); col++)
+            for (int col = 0; col < size.Width; col++)
             {
-                _tiles[row, col] = line[col];
+                tiles[row, col] = line[col];
+            }
+        }
+        for (int row = 0; row < size.Height; row++)
+        {
+            var line = reader.ReadLine() ?? new string('0', size.Width);
+            
+            for (int col = 0; col < size.Width; col++)
+            {
+                darkTiles[row, col] = line[col];
+            }
+        }
+        for (int row = 0; row < size.Height; row++)
+        {
+            var line = reader.ReadLine() ?? new string('0', size.Width);
+            
+            for (int col = 0; col < size.Width; col++)
+            {
+                lightTiles[row, col] = line[col];
             }
         }
 
         reader.Dispose();
+
+        return new Tilemap
+        {
+            _tiles = tiles,
+            _darkTiles = darkTiles,
+            _lightTiles = lightTiles,
+            _tilemapSize = size,
+            _spawnPoint = new(startX, startY),
+            _endPoint = new(endX, endY),
+        };
     }
     
     public void SaveToFile(string path)
     {
         var writer = File.CreateText(path);
-        writer.WriteLine(_tiles.GetLength(0));
-        writer.WriteLine(_tiles.GetLength(1));
-        for (int row = 0; row < _tiles.GetLength(0); row++)
+        writer.WriteLine(_tilemapSize.Width);
+        writer.WriteLine(_tilemapSize.Height);
+        writer.WriteLine(_spawnPoint.X);
+        writer.WriteLine(_spawnPoint.Y);
+        writer.WriteLine(_endPoint.X);
+        writer.WriteLine(_endPoint.Y);
+        for (int row = 0; row < _tilemapSize.Height; row++)
         {
-            for (int col = 0; col < _tiles.GetLength(1); col++)
+            for (int col = 0; col < _tilemapSize.Width; col++)
             {
                 writer.Write((char)_tiles[row, col]);
+            }
+            writer.WriteLine();
+        }
+        for (int row = 0; row < _tilemapSize.Height; row++)
+        {
+            for (int col = 0; col < _tilemapSize.Width; col++)
+            {
+                writer.Write((char)_darkTiles[row, col]);
+            }
+            writer.WriteLine();
+        }
+        for (int row = 0; row < _tilemapSize.Height; row++)
+        {
+            for (int col = 0; col < _tilemapSize.Width; col++)
+            {
+                writer.Write((char)_lightTiles[row, col]);
             }
             writer.WriteLine();
         }
@@ -177,36 +267,37 @@ public class Tilemap
 
     public void Render(SpriteBatch spriteBatch)
     {
+        RenderLayer(spriteBatch, WorldMode.None, Color.White);
+        RenderLayer(spriteBatch, UpfallCommon.CurrentWorldMode, Color.White);
+    }
+
+    public void EditorRender(SpriteBatch spriteBatch)
+    {
+        foreach (WorldMode mode in Enum.GetValues<WorldMode>())
+        {
+            Color color = Color.White;
+            if (mode != UpfallCommon.CurrentWorldMode)
+                color *= 0.33f;
+            RenderLayer(spriteBatch, mode, color);
+        }
+    }
+
+    private void RenderLayer(SpriteBatch spriteBatch, WorldMode mode, Color color)
+    {
+        int[,] layer = mode switch
+        {
+            WorldMode.Dark => _darkTiles,
+            WorldMode.Light => _lightTiles,
+            _ => _tiles,
+        };
+
         for (int row = 0; row < _tiles.GetLength(0); row++)
         {
             for (int col = 0; col < _tiles.GetLength(1); col++)
             {
-                int tile = _tiles[row, col];
+                int tile = layer[row, col];
                 if (tile != 0)
-                {
-                    Color white = Color.White;
-                    if (UpfallCommon.InEditor && UpfallCommon.CurrentWorldMode != WorldMode.None)
-                        white *= 0.33f;
-                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, white, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
-                }
-                switch (UpfallCommon.CurrentWorldMode)
-                {
-                    case WorldMode.Dark:
-                        tile = _darkTiles[row, col];
-                        if (tile != 0)
-                            spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.White, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
-                        break;
-
-                    case WorldMode.Light:
-                        tile = _lightTiles[row, col];
-                        if (tile != 0)
-                            spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.White, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
-                        break;
-                    
-                    default:
-                    case WorldMode.None:
-                        break;
-                }
+                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, color, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
             }
         }
     }

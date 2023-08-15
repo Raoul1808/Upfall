@@ -17,8 +17,8 @@ internal class Program
             ShowMouse = true,
         });
 
-        SceneManager.Add("Game Scene", new GameScene());
-        SceneManager.Add("Edit Scene", new EditScene());
+        SceneManager.Add("Editor", new EditScene());
+        SceneManager.Add("Game", new GameScene());
 
         game.Run();
     }

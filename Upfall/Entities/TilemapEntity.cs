@@ -20,4 +20,8 @@ public abstract class TilemapEntity : Entity
     public virtual void OnTileRightTouched(Rectangle tile)
     {
     }
+
+    public virtual void Kill()
+    {
+    }
 }
