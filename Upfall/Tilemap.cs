@@ -12,9 +12,9 @@ namespace Upfall;
 
 public class Tilemap
 {
-    private int[,] _tiles;
-    private int[,] _darkTiles;
-    private int[,] _lightTiles;
+    private Tile[,] _tiles;
+    private Tile[,] _darkTiles;
+    private Tile[,] _lightTiles;
     private Size _tilemapSize;
     private Point _spawnPoint;
     private Point _endPoint;
@@ -28,24 +28,24 @@ public class Tilemap
     public Tilemap(Size size)
     {
         _tilemapSize = size;
-        _tiles = new int[size.Height, size.Width];
-        _darkTiles = new int[size.Height, size.Width];
-        _lightTiles = new int[size.Height, size.Width];
+        _tiles = new Tile[size.Height, size.Width];
+        _darkTiles = new Tile[size.Height, size.Width];
+        _lightTiles = new Tile[size.Height, size.Width];
     }
 
-    public void SetCommonTile(Point pos, int tile)
+    public void SetCommonTile(Point pos, TileType tile)
     {
-        _tiles[pos.Y, pos.X] = tile;
+        _tiles[pos.Y, pos.X].TileId = tile;
     }
 
-    public void SetDarkTile(Point pos, int tile)
+    public void SetDarkTile(Point pos, TileType tile)
     {
-        _darkTiles[pos.Y, pos.X] = tile;
+        _darkTiles[pos.Y, pos.X].TileId = tile;
     }
 
-    public void SetLightTile(Point pos, int tile)
+    public void SetLightTile(Point pos, TileType tile)
     {
-        _lightTiles[pos.Y, pos.X] = tile;
+        _lightTiles[pos.Y, pos.X].TileId = tile;
     }
 
     public void SetSpawn(Point pos)
@@ -58,16 +58,16 @@ public class Tilemap
         _endPoint = pos;
     }
 
-    public int GetTileCommon(int x, int y) => _tiles[y, x];
+    public Tile GetTileCommon(int x, int y) => _tiles[y, x];
 
-    public int GetTileDark(int x, int y) => _darkTiles[y, x];
+    public Tile GetTileDark(int x, int y) => _darkTiles[y, x];
 
-    public int GetTileLight(int x, int y) => _lightTiles[y, x];
+    public Tile GetTileLight(int x, int y) => _lightTiles[y, x];
 
-    public int GetTile(int x, int y)
+    public Tile GetTile(int x, int y)
     {
-        int tile = GetTileCommon(x, y);
-        if (tile == 0)
+        Tile tile = GetTileCommon(x, y);
+        if (tile.TileId == 0)
         {
             switch (UpfallCommon.CurrentWorldMode)
             {
@@ -76,10 +76,6 @@ public class Tilemap
 
                 case WorldMode.Light:
                     return GetTileLight(x, y);
-                
-                case WorldMode.None:
-                default:
-                    return 0;
             }
         }
 
@@ -111,16 +107,16 @@ public class Tilemap
         var endX = int.Parse(reader.ReadLine() ?? "0");
         var endY = int.Parse(reader.ReadLine() ?? "0");
         var size = new Size(width, height);
-        var tiles = new int[height, width];
-        var darkTiles = new int[height, width];
-        var lightTiles = new int[height, width];
+        var tiles = new Tile[height, width];
+        var darkTiles = new Tile[height, width];
+        var lightTiles = new Tile[height, width];
         for (int row = 0; row < size.Height; row++)
         {
             var line = reader.ReadLine() ?? new string('0', size.Width);
             
             for (int col = 0; col < size.Width; col++)
             {
-                tiles[row, col] = line[col];
+                tiles[row, col].TileId = (TileType)line[col];
             }
         }
         for (int row = 0; row < size.Height; row++)
@@ -129,7 +125,7 @@ public class Tilemap
             
             for (int col = 0; col < size.Width; col++)
             {
-                darkTiles[row, col] = line[col];
+                darkTiles[row, col].TileId = (TileType)line[col];
             }
         }
         for (int row = 0; row < size.Height; row++)
@@ -138,7 +134,7 @@ public class Tilemap
             
             for (int col = 0; col < size.Width; col++)
             {
-                lightTiles[row, col] = line[col];
+                lightTiles[row, col].TileId = (TileType)line[col];
             }
         }
 
@@ -168,7 +164,7 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                writer.Write((char)_tiles[row, col]);
+                writer.Write((char)_tiles[row, col].TileId);
             }
             writer.WriteLine();
         }
@@ -176,7 +172,7 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                writer.Write((char)_darkTiles[row, col]);
+                writer.Write((char)_darkTiles[row, col].TileId);
             }
             writer.WriteLine();
         }
@@ -184,7 +180,7 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                writer.Write((char)_lightTiles[row, col]);
+                writer.Write((char)_lightTiles[row, col].TileId);
             }
             writer.WriteLine();
         }
@@ -210,8 +206,8 @@ public class Tilemap
             {
                 var bbox = entity.BoundingBox;
                 var tileRect = GetTileRect(x, y);
-                int tile = GetTile(x, y);
-                if (tile != 0 && bbox.Intersects(tileRect))
+                Tile tile = GetTile(x, y);
+                if (tile.TileId != 0 && bbox.Intersects(tileRect))
                 {
                     tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tileRect));
                 }
@@ -284,7 +280,7 @@ public class Tilemap
 
     private void RenderLayer(SpriteBatch spriteBatch, WorldMode mode, Color color)
     {
-        int[,] layer = mode switch
+        Tile[,] layer = mode switch
         {
             WorldMode.Dark => _darkTiles,
             WorldMode.Light => _lightTiles,
@@ -295,9 +291,12 @@ public class Tilemap
         {
             for (int col = 0; col < _tiles.GetLength(1); col++)
             {
-                int tile = layer[row, col];
-                if (tile != 0)
-                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, color, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
+                Tile tile = layer[row, col];
+                if (tile.TileId != TileType.None)
+                {
+                    var tex = tile.TileId.GetTextureForType();
+                    spriteBatch.Draw(tex ?? Assets.Pixel, new Rectangle(col * TileSize, row * TileSize, TileSize, TileSize), null, color, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+                }
             }
         }
     }

@@ -14,6 +14,7 @@ internal class GameScene : Scene
     
     public override void Load()
     {
+        Assets.GetTexture("tileset");
         CanvasEffect = Assets.GetEffect("DynamicOneBit");
         if (CanvasEffect != null)
         {

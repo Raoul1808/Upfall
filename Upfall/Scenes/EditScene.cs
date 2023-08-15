@@ -42,9 +42,9 @@ public class EditScene : Scene
         int y = BroccoMath.Clamp((int)pos.Y / Tilemap.TileSize, 0, _tilemapSize.Height - 1);
         _currentTilePos = new Point(x, y);
         if (InputManager.GetClickDown(MouseButtons.Left))
-            SetTile(_currentTilePos, 1);
+            SetTile(_currentTilePos, TileType.Solid);
         if (InputManager.GetClickDown(MouseButtons.Right))
-            SetTile(_currentTilePos, 0);
+            SetTile(_currentTilePos, TileType.None);
         if (InputManager.GetClickDown(MouseButtons.Middle))
         {
             _tilemap.SetSpawn(_currentTilePos);
@@ -71,7 +71,7 @@ public class EditScene : Scene
         }
     }
 
-    private void SetTile(Point pos, int tile)
+    private void SetTile(Point pos, TileType tile)
     {
         switch (UpfallCommon.CurrentWorldMode)
         {
