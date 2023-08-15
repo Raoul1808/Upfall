@@ -1,4 +1,3 @@
-using System;
 using Brocco;
 using Brocco.Basic;
 using Brocco.Input;
@@ -67,11 +66,13 @@ public class EditScene : Scene
             if (InputManager.GetKeyPress(Keys.S))
             {
                 _tilemap.SaveToFile("map.umd");
+                NotificationSystem.SendNotification("Saved Level");
             }
 
             if (InputManager.GetKeyPress(Keys.O))
             {
                 _tilemap = Tilemap.LoadFromFile("map.umd");
+                NotificationSystem.SendNotification("Loaded Level");
             }
 
             if (InputManager.GetKeyPress(Keys.T))
@@ -86,6 +87,7 @@ public class EditScene : Scene
             _currentTileId++;
             if (_currentTileId > TileType.RightSpike)
                 _currentTileId = TileType.Solid;
+            NotificationSystem.SendNotification("Selected tile " + _currentTileId);
         }
 
         if (InputManager.GetKeyPress(Keys.Left))
@@ -93,6 +95,7 @@ public class EditScene : Scene
             _currentTileId--;
             if (_currentTileId <= TileType.None)
                 _currentTileId = TileType.RightSpike;
+            NotificationSystem.SendNotification("Selected tile " + _currentTileId);
         }
     }
 

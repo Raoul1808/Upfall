@@ -16,6 +16,10 @@ internal class Program
             ClearColor = Color.Black,
             ShowMouse = true,
         });
+        
+        Assets.PreloadFont("Open Sans", new []{"OpenSans.ttf"});
+        
+        game.AddSystem<NotificationSystem>();
 
         SceneManager.Add("Editor", new EditScene());
         SceneManager.Add("Game", new GameScene());
