@@ -28,12 +28,13 @@ public class Player : TilemapEntity
     private bool _isJumping = false;
     
     public bool IsDead { get; private set; }
-    
+    public bool WonLevel { get; private set; }
+
     public Player()
     {
         CurrentTexture = Assets.GetTexture("player");
-        Position = new Vector2(100, 100);
         IsDead = false;
+        WonLevel = false;
     }
     
     public override void Update(float dt)
@@ -133,5 +134,11 @@ public class Player : TilemapEntity
         // 🦀 The player is dead 🦀
         IsDead = true;
         Dispose();
+    }
+
+    public void Win()
+    {
+        // Win code
+        WonLevel = true;
     }
 }

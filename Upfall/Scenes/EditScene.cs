@@ -51,8 +51,15 @@ public class EditScene : Scene
             SetTile(_currentTilePos, TileType.None);
         if (InputManager.GetClickDown(MouseButtons.Middle))
         {
-            _tilemap.SetSpawn(_currentTilePos);
-            _player.Position = _tilemap.GetSpawnPos();
+            if (InputManager.GetKeyDown(Keys.LeftControl))
+            {
+                _tilemap.SetExit(_currentTilePos);
+            }
+            else
+            {
+                _tilemap.SetSpawn(_currentTilePos);
+                _player.Position = _tilemap.GetSpawnPos();
+            }
         }
 
         if (InputManager.GetKeyDown(Keys.LeftControl))

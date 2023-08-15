@@ -1,4 +1,3 @@
-using System;
 using Brocco;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,6 +12,7 @@ public enum TileType : byte
     DownSpike,
     LeftSpike,
     RightSpike,
+    ExitDoor,
 }
 
 public static class TileTypeExtensions
@@ -26,6 +26,7 @@ public static class TileTypeExtensions
             TileType.DownSpike => Assets.GetTexture("spike"),
             TileType.LeftSpike => Assets.GetTexture("spike"),
             TileType.RightSpike => Assets.GetTexture("spike"),
+            TileType.ExitDoor => Assets.GetTexture("door"),
             _ => null
         };
     }

@@ -96,9 +96,11 @@ public class Tilemap
     public Rectangle GetTileRect(int x, int y, TileType type)
     {
         const int spikeGap = 10;
+        const int doorGap = 1;
         
         return type switch
         {
+            TileType.ExitDoor => new Rectangle(x * TileSize + doorGap, y * TileSize + doorGap, TileSize - doorGap * 2, TileSize - doorGap),
             TileType.UpSpike => new Rectangle(x * TileSize, y * TileSize + spikeGap, TileSize, TileSize - spikeGap),
             TileType.DownSpike => new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
             TileType.LeftSpike => new Rectangle(x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
@@ -204,6 +206,12 @@ public class Tilemap
     
     public void SolveCollisions(TilemapEntity entity)
     {
+        if (entity.GetType() == typeof(Player) && entity.BoundingBox.Intersects(GetTileRect(_endPoint, TileType.ExitDoor)))
+        {
+            // Trigger level win immediately
+            ((Player)entity).Win();
+            return;  // We don't want to process collisions
+        }
         var pos = entity.Position / TileSize;
         int lx = Math.Max((int)pos.X - 1, 0);
         int ux = Math.Min((int)pos.X + 2, _tiles.GetLength(1) - 1);
@@ -282,6 +290,7 @@ public class Tilemap
     {
         RenderLayer(spriteBatch, WorldMode.None, Color.White);
         RenderLayer(spriteBatch, UpfallCommon.CurrentWorldMode, Color.White);
+        RenderTile(spriteBatch, Color.White, _endPoint, TileType.ExitDoor);
     }
 
     public void EditorRender(SpriteBatch spriteBatch)
@@ -293,6 +302,8 @@ public class Tilemap
                 color *= 0.33f;
             RenderLayer(spriteBatch, mode, color);
         }
+
+        RenderTile(spriteBatch, Color.White, _endPoint, TileType.ExitDoor);
     }
 
     private void RenderLayer(SpriteBatch spriteBatch, WorldMode mode, Color color)

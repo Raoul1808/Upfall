@@ -39,8 +39,8 @@ internal class GameScene : Scene
 
     public override void Update(float dt)
     {
-        // TODO: add more gentle transition
-        if (_player.IsDead)
+        // TODO: add more gentle transitions
+        if (_player.IsDead || _player.WonLevel)
         {
             SceneManager.Reload("Game");
             return;  // Don't execute further
