@@ -13,20 +13,51 @@ namespace Upfall;
 public class Tilemap
 {
     private int[,] _tiles;
+    private int[,] _darkTiles;
+    private int[,] _lightTiles;
+    private Point _spawnPoint;
+    private Point _endPoint;
 
     public Tilemap(int[,] tiles)
     {
+        Size sz = new Size(tiles.GetLength(1), tiles.GetLength(0));
         _tiles = tiles;
+        _darkTiles = new int[sz.Height, sz.Width];
+        _lightTiles = new int[sz.Height, sz.Width];
     }
 
     public Tilemap(Size size)
     {
         _tiles = new int[size.Height, size.Width];
+        _darkTiles = new int[size.Height, size.Width];
+        _lightTiles = new int[size.Height, size.Width];
     }
 
     public void SetTile(Point pos, int tile)
     {
         _tiles[pos.Y, pos.X] = tile;
+    }
+
+    public int GetTile(int x, int y)
+    {
+        int tile = _tiles[y, x];
+        if (tile == 0)
+        {
+            switch (UpfallCommon.CurrentWorldMode)
+            {
+                case WorldMode.Dark:
+                    return _darkTiles[y, x];
+
+                case WorldMode.Light:
+                    return _lightTiles[y, x];
+                
+                case WorldMode.None:
+                default:
+                    return 0;
+            }
+        }
+
+        return tile;
     }
 
     public Rectangle GetTileRect(Point pos) => GetTileRect(pos.X, pos.Y);
@@ -73,7 +104,7 @@ public class Tilemap
 
     private string RectToStr(Rectangle rect) => $"{{Left: {rect.Left}, Right: {rect.Right}, Top: {rect.Top}, Bottom: {rect.Bottom}}}";
     
-    public void SolveCollisions(Entity entity)
+    public void SolveCollisions(TilemapEntity entity)
     {
         var pos = entity.Position / TileSize;
         int lx = Math.Max((int)pos.X - 1, 0);
@@ -89,7 +120,8 @@ public class Tilemap
             {
                 var bbox = entity.BoundingBox;
                 var tileRect = GetTileRect(x, y);
-                if (_tiles[y, x] != 0 && bbox.Intersects(tileRect))
+                int tile = GetTile(x, y);
+                if (tile != 0 && bbox.Intersects(tileRect))
                 {
                     tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tileRect));
                 }
@@ -116,12 +148,14 @@ public class Tilemap
                 {
                     entity.Position.Y = tileRect.Top - entity.BoundingBox.Height / 2f;
                     entity.Velocity.Y = 0;
+                    entity.OnTileTopTouched(tileRect);
                 }
 
                 if (entity.TouchedBottomOf(tileRect))
                 {
                     entity.Position.Y = tileRect.Bottom + entity.BoundingBox.Height / 2f;
                     entity.Velocity.Y = 0;
+                    entity.OnTileBottomTouched(tileRect);
                 }
             }
             
@@ -129,12 +163,14 @@ public class Tilemap
             {
                 entity.Position.X = tileRect.Left - entity.BoundingBox.Width / 2f;
                 entity.Velocity.X = 0;
+                entity.OnTileLeftTouched(tileRect);
             }
             
             if (entity.TouchedRightOf(tileRect))
             {
                 entity.Position.X = tileRect.Right + entity.BoundingBox.Width / 2f;
                 entity.Velocity.X = 0;
+                entity.OnTileRightTouched(tileRect);
             }
         }
     }
@@ -147,7 +183,30 @@ public class Tilemap
             {
                 int tile = _tiles[row, col];
                 if (tile != 0)
-                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.White, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
+                {
+                    Color white = Color.White;
+                    if (UpfallCommon.InEditor && UpfallCommon.CurrentWorldMode != WorldMode.None)
+                        white *= 0.33f;
+                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, white, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
+                }
+                switch (UpfallCommon.CurrentWorldMode)
+                {
+                    case WorldMode.Dark:
+                        tile = _darkTiles[row, col];
+                        if (tile != 0)
+                            spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.White, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
+                        break;
+
+                    case WorldMode.Light:
+                        tile = _lightTiles[row, col];
+                        if (tile != 0)
+                            spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.White, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
+                        break;
+                    
+                    default:
+                    case WorldMode.None:
+                        break;
+                }
             }
         }
     }

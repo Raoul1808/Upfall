@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Upfall.Entities;
 
-public class Player : Entity
+public class Player : TilemapEntity
 {
     enum FallDirection
     {
@@ -14,8 +14,8 @@ public class Player : Entity
         Up = -1,
     }
     
-    private const float MaxFallSpeed = 30f;
-    private const float Gravity = 20f;
+    private const float MaxFallSpeed = 7.5f;
+    private const float Gravity = 0.5f;
     private const float JumpForce = 7f;
     
     private const float HorizontalSpeed = 5f;
@@ -43,7 +43,7 @@ public class Player : Entity
         if (flipGravity)
         {
             _fallDirection = _fallDirection == FallDirection.Down ? FallDirection.Up : FallDirection.Down;
-            Velocity.Y *= 0.5f;
+            UpfallCommon.CurrentWorldMode = _fallDirection == FallDirection.Down ? WorldMode.Dark : WorldMode.Light;
         }
 
         if (left)
@@ -58,9 +58,9 @@ public class Player : Entity
         if (Math.Sign(_targetSpeed - Velocity.X) != direction)
             Velocity.X = _targetSpeed;
 
-        Velocity.Y += Gravity * (int)_fallDirection * dt;
-        if (Velocity.Y >= MaxFallSpeed)
-            Velocity.Y = MaxFallSpeed;
+        Velocity.Y += Gravity * (int)_fallDirection;
+        if (Math.Abs(Velocity.Y) >= MaxFallSpeed)
+            Velocity.Y = MaxFallSpeed * (int)_fallDirection;
 
         if (jump && _canJump)
         {
@@ -88,5 +88,33 @@ public class Player : Entity
     private void OnTouchCeiling()
     {
         _isJumping = false;
+    }
+
+    public override void OnTileTopTouched(Rectangle tile)
+    {
+        switch (_fallDirection)
+        {
+            case FallDirection.Down:
+                OnLand();
+                break;
+
+            case FallDirection.Up:
+                OnTouchCeiling();
+                break;
+        }
+    }
+
+    public override void OnTileBottomTouched(Rectangle tile)
+    {
+        switch (_fallDirection)
+        {
+            case FallDirection.Down:
+                OnTouchCeiling();
+                break;
+
+            case FallDirection.Up:
+                OnLand();
+                break;
+        }
     }
 }
