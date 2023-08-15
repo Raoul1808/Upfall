@@ -9,7 +9,7 @@ internal class Program
 {
     public static void Main()
     {
-        var game = new BroccoGame(new BroccoGameSettings
+        using var game = new BroccoGame(new BroccoGameSettings
         {
             CanvasSize = new Size(640, 360),
             Resolution = new Size(1280, 720),
