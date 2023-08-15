@@ -15,6 +15,7 @@ public class EditScene : Scene
     private Size _tilemapSize;
     private Point _currentTilePos;
     private Player _player;
+    private string _levelFilename = "map.umd";
 
     private TileType _currentTileId;
     
@@ -24,12 +25,12 @@ public class EditScene : Scene
         _player = AddToScene<Player>();
         _tilemap = new Tilemap(_tilemapSize = new Size(40, 23));
         PauseUpdate = true;
-        UpfallCommon.InEditor = true;
     }
 
     public override void OnBecomeActive()
     {
         UpfallCommon.CurrentWorldMode = WorldMode.None;
+        UpfallCommon.InEditor = true;
         _currentTileId = TileType.Solid;
     }
 
@@ -65,13 +66,13 @@ public class EditScene : Scene
         {
             if (InputManager.GetKeyPress(Keys.S))
             {
-                _tilemap.SaveToFile("map.umd");
+                _tilemap.SaveToFile(_levelFilename);
                 NotificationSystem.SendNotification("Saved Level");
             }
 
             if (InputManager.GetKeyPress(Keys.O))
             {
-                _tilemap = Tilemap.LoadFromFile("map.umd");
+                _tilemap = Tilemap.LoadFromFile(_levelFilename);
                 NotificationSystem.SendNotification("Loaded Level");
             }
 
@@ -79,6 +80,8 @@ public class EditScene : Scene
             {
                 _tilemap.SaveToFile("map.umd");
                 SceneManager.Change("Game");
+                NotificationSystem.SendNotification("Now playing level " + _levelFilename);
+                return;  // Don't execute further
             }
         }
 

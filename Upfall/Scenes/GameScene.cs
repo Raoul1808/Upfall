@@ -39,16 +39,27 @@ internal class GameScene : Scene
 
     public override void Update(float dt)
     {
+        bool quitting = InputManager.GetKeyPress(Keys.Escape);
+        if (UpfallCommon.InEditor && quitting)
+        {
+            // We're playtesting, go back to the editor
+            SceneManager.Change("Editor");
+            return;  // Don't execute further
+        }
+        
+        if (quitting)
+        {
+            // We're in-game, open pause menu to allow going back to main menu
+            // TODO: make pause menu
+            SceneManager.Change("Menu");
+            return;  // Don't execute further
+        }
+        
         // TODO: add more gentle transitions
         if (_player.IsDead || _player.WonLevel)
         {
             SceneManager.Reload("Game");
             return;  // Don't execute further
-        }
-        
-        if (InputManager.GetKeyDown(Keys.Escape))
-        {
-            SceneManager.Change("Editor");
         }
         
         // Prevent player from going out of screen

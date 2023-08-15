@@ -140,5 +140,6 @@ public class Player : TilemapEntity
     {
         // Win code
         WonLevel = true;
+        Velocity = Vector2.Zero;
     }
 }

@@ -21,8 +21,9 @@ internal class Program
         
         game.AddSystem<NotificationSystem>();
 
-        SceneManager.Add("Editor", new EditScene());
+        SceneManager.Add("Menu", new MenuScene());
         SceneManager.Add("Game", new GameScene());
+        SceneManager.Add("Editor", new EditScene());
 
         game.Run();
     }
