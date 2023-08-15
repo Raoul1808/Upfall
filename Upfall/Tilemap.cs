@@ -91,9 +91,21 @@ public class Tilemap
     public int GetTop() => 0;
     public int GetBottom() => _tilemapSize.Height * TileSize;
 
-    public Rectangle GetTileRect(Point pos) => GetTileRect(pos.X, pos.Y);
+    public Rectangle GetTileRect(Point pos, TileType type) => GetTileRect(pos.X, pos.Y, type);
 
-    public Rectangle GetTileRect(int x, int y) => new(x * TileSize, y * TileSize, TileSize, TileSize);
+    public Rectangle GetTileRect(int x, int y, TileType type)
+    {
+        const int spikeGap = 10;
+        
+        return type switch
+        {
+            TileType.UpSpike => new Rectangle(x * TileSize, y * TileSize + spikeGap, TileSize, TileSize - spikeGap),
+            TileType.DownSpike => new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
+            TileType.LeftSpike => new Rectangle(x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.RightSpike => new Rectangle(x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
+            _ => new(x * TileSize, y * TileSize, TileSize, TileSize),
+        };
+    }
     
     public const int TileSize = 16;
 
@@ -205,10 +217,15 @@ public class Tilemap
             for (int y = ly; y <= uy; y++)
             {
                 var bbox = entity.BoundingBox;
-                var tileRect = GetTileRect(x, y);
                 Tile tile = GetTile(x, y);
+                var tileRect = GetTileRect(x, y, tile.TileId);
                 if (tile.TileId != 0 && bbox.Intersects(tileRect))
                 {
+                    if (tile.TileId.IsLethal())
+                    {
+                        entity.Kill();
+                        return;  // Entity is dead, no need to check for collisions
+                    }
                     tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tileRect));
                 }
             }
@@ -292,12 +309,26 @@ public class Tilemap
             for (int col = 0; col < _tiles.GetLength(1); col++)
             {
                 Tile tile = layer[row, col];
-                if (tile.TileId != TileType.None)
-                {
-                    var tex = tile.TileId.GetTextureForType();
-                    spriteBatch.Draw(tex ?? Assets.Pixel, new Rectangle(col * TileSize, row * TileSize, TileSize, TileSize), null, color, 0f, Vector2.Zero, SpriteEffects.None, 0f);
-                }
+                RenderTile(spriteBatch, color, new(col, row), tile.TileId);
             }
+        }
+    }
+
+    public void RenderTile(SpriteBatch spriteBatch, Color color, Point pos, TileType tileId)
+    {
+        if (tileId != TileType.None)
+        {
+            var tex = tileId.GetTextureForType() ?? Assets.Pixel;
+            var rot = tileId.GetRotationForType();
+            var rect = new Rectangle(pos.X * TileSize, pos.Y * TileSize, TileSize, TileSize);
+            var offset = Vector2.Zero;
+            if (tex != Assets.Pixel)
+            {
+                rect.X += (int)HalfTile.X;
+                rect.Y += (int)HalfTile.Y;
+                offset = HalfTile;
+            }
+            spriteBatch.Draw(tex ?? Assets.Pixel, rect, null, color, rot, offset, SpriteEffects.None, 0f);
         }
     }
 }

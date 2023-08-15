@@ -1,3 +1,4 @@
+using System;
 using Brocco;
 using Brocco.Basic;
 using Brocco.Input;
@@ -15,6 +16,8 @@ public class EditScene : Scene
     private Size _tilemapSize;
     private Point _currentTilePos;
     private Player _player;
+
+    private TileType _currentTileId;
     
     public override void Load()
     {
@@ -28,6 +31,7 @@ public class EditScene : Scene
     public override void OnBecomeActive()
     {
         UpfallCommon.CurrentWorldMode = WorldMode.None;
+        _currentTileId = TileType.Solid;
     }
 
     public override void Update(float dt)
@@ -42,7 +46,7 @@ public class EditScene : Scene
         int y = BroccoMath.Clamp((int)pos.Y / Tilemap.TileSize, 0, _tilemapSize.Height - 1);
         _currentTilePos = new Point(x, y);
         if (InputManager.GetClickDown(MouseButtons.Left))
-            SetTile(_currentTilePos, TileType.Solid);
+            SetTile(_currentTilePos, _currentTileId);
         if (InputManager.GetClickDown(MouseButtons.Right))
             SetTile(_currentTilePos, TileType.None);
         if (InputManager.GetClickDown(MouseButtons.Middle))
@@ -69,6 +73,20 @@ public class EditScene : Scene
                 SceneManager.Change("Game");
             }
         }
+
+        if (InputManager.GetKeyPress(Keys.Right))
+        {
+            _currentTileId++;
+            if (_currentTileId > TileType.RightSpike)
+                _currentTileId = TileType.Solid;
+        }
+
+        if (InputManager.GetKeyPress(Keys.Left))
+        {
+            _currentTileId--;
+            if (_currentTileId <= TileType.None)
+                _currentTileId = TileType.RightSpike;
+        }
     }
 
     private void SetTile(Point pos, TileType tile)
@@ -93,7 +111,6 @@ public class EditScene : Scene
     {
         _tilemap.EditorRender(spriteBatch);
         _player.Render(spriteBatch);
-        int s = Tilemap.TileSize;
-        spriteBatch.Draw(Assets.Pixel, new Rectangle(_currentTilePos.X * s, _currentTilePos.Y * s, s, s), Color.DimGray * 0.5f);
+        _tilemap.RenderTile(spriteBatch, Color.DimGray * 0.5f, _currentTilePos, _currentTileId);
     }
 }
