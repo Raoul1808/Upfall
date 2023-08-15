@@ -2,6 +2,7 @@ using System;
 using Brocco;
 using Brocco.Input;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Upfall.Entities;
@@ -44,6 +45,7 @@ public class Player : TilemapEntity
         {
             _fallDirection = _fallDirection == FallDirection.Down ? FallDirection.Up : FallDirection.Down;
             UpfallCommon.CurrentWorldMode = _fallDirection == FallDirection.Down ? WorldMode.Dark : WorldMode.Light;
+            Flip ^= SpriteEffects.FlipVertically;
         }
 
         if (left)
@@ -77,6 +79,11 @@ public class Player : TilemapEntity
             _isJumping = false;
             Velocity.Y *= 0.5f;
         }
+
+        if (Velocity.X < 0)
+            Flip |= SpriteEffects.FlipHorizontally;
+        if (Velocity.X > 0)
+            Flip &= ~SpriteEffects.FlipHorizontally;
     }
 
     private void OnLand()
