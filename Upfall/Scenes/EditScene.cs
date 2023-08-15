@@ -16,7 +16,6 @@ public class EditScene : Scene
     private Size _tilemapSize;
     private Point _currentTilePos;
     private Player _player;
-    private bool _updatePlayer = false;
     
     public override void Load()
     {

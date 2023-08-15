@@ -9,9 +9,6 @@ internal class GameScene : Scene
 {
     private Player _player;
     private Tilemap _tilemap;
-
-    private float _colorTimer = 0f;
-    private bool _goingDown = false;
     
     public override void Load()
     {
