@@ -147,7 +147,7 @@ public class Tilemap
             {
                 int tile = _tiles[row, col];
                 if (tile != 0)
-                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.Black, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
+                    spriteBatch.Draw(Assets.Pixel, new Vector2(col * TileSize, row * TileSize), null, Color.White, 0f, Vector2.Zero, new Vector2(TileSize), SpriteEffects.None, 0f);
             }
         }
     }

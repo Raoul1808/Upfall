@@ -1,4 +1,5 @@
 using Brocco;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Upfall.Entities;
 
@@ -8,9 +9,18 @@ internal class GameScene : Scene
 {
     private Player _player;
     private Tilemap _tilemap;
+
+    private float _colorTimer = 0f;
+    private bool _goingDown = false;
     
     public override void Load()
     {
+        CanvasEffect = Assets.GetEffect("DynamicOneBit");
+        if (CanvasEffect != null)
+        {
+            CanvasEffect.Parameters["BitColor1"].SetValue(Color.DarkRed.ToVector4());
+            CanvasEffect.Parameters["BitColor2"].SetValue(Color.OrangeRed.ToVector4());
+        }
         _player = AddToScene<Player>();
         _tilemap = new Tilemap(new int[,]
         {
