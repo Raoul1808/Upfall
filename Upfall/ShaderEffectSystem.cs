@@ -31,6 +31,8 @@ public class ShaderEffectSystem : BroccoAutoSystem
 
     public override void PostUpdate(GameTime gameTime)
     {
+        const float wobbleAmount = 15f;
+        
         float tt = (float)gameTime.TotalGameTime.TotalSeconds;
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         if (Math.Abs(_currentCircleSize - _targetCircleSize) > 0.0001f)
@@ -39,7 +41,7 @@ public class ShaderEffectSystem : BroccoAutoSystem
             _currentCircleSize = MathHelper.Lerp(_startCircleSize, _targetCircleSize, (float)EaseOutQuart(_circleTimer / CircleTransitionTime));
         }
         Console.WriteLine(_circleTimer);
-        _circleWobbleSize = (float)Math.Sin(tt) * 5f - 5f;
+        _circleWobbleSize = (float)Math.Sin(tt) * wobbleAmount - wobbleAmount;
         SetCircleRadius(_currentCircleSize + _circleWobbleSize);
     }
 
