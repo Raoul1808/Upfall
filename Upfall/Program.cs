@@ -17,8 +17,6 @@ internal class Program
             ShowMouse = true,
         };
         using var game = new BroccoGame(gameSettings);
-
-        UpfallCommon.CanvasSize = gameSettings.CanvasSize;
         
         Assets.PreloadFont("Open Sans", new []{"OpenSans.ttf"});
         

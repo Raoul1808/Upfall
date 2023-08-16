@@ -82,6 +82,7 @@ internal class GameScene : Scene
         
         base.Update(dt);
         _tilemap.SolveCollisions(_player);
+        ShaderEffectSystem.SetCircleCanvasPos(_player.Position);
     }
 
     public override void CanvasRender(SpriteBatch spriteBatch)
