@@ -15,11 +15,11 @@ public class Player : TilemapEntity
         Up = -1,
     }
     
-    private const float MaxFallSpeed = 7.5f;
-    private const float Gravity = 0.5f;
-    private const float JumpForce = 7f;
+    private const float MaxFallSpeed = 6.5f;
+    private const float Gravity = 0.3f;
+    private const float JumpForce = 5.5f;
     
-    private const float HorizontalSpeed = 5f;
+    private const float HorizontalSpeed = 4f;
     private const float HorizontalAcceleration = 1f;
 
     private FallDirection _fallDirection = FallDirection.Down;
