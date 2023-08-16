@@ -21,6 +21,7 @@ internal class GameScene : Scene
             CanvasEffect.Parameters["BitColor1"].SetValue(Color.Blue.ToVector4());
             CanvasEffect.Parameters["BitColor2"].SetValue(Color.CornflowerBlue.ToVector4());
         }
+        BlendState = BlendState.Additive;
     }
 
     public override void OnBecomeActive()
@@ -83,6 +84,7 @@ internal class GameScene : Scene
         base.Update(dt);
         _tilemap.SolveCollisions(_player);
         ShaderEffectSystem.SetCircleCanvasPos(_player.Position);
+        ShaderEffectSystem.SetCircleRadius(UpfallCommon.CurrentWorldMode == WorldMode.Dark ? 0f : 150f);
     }
 
     public override void CanvasRender(SpriteBatch spriteBatch)

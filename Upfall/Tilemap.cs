@@ -431,8 +431,9 @@ public class Tilemap
 
     public void Render(SpriteBatch spriteBatch)
     {
-        RenderLayer(spriteBatch, WorldMode.None, Color.White);
-        RenderLayer(spriteBatch, UpfallCommon.CurrentWorldMode, Color.White);
+        RenderLayer(spriteBatch, WorldMode.None, Color.Fuchsia);
+        RenderLayer(spriteBatch, WorldMode.Dark, Color.Red);
+        RenderLayer(spriteBatch, WorldMode.Light, Color.Blue);
         RenderTile(spriteBatch, Color.White, _endPoint, TileType.ExitDoor);
     }
 

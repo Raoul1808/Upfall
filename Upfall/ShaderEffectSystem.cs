@@ -20,7 +20,7 @@ public class ShaderEffectSystem : BroccoAutoSystem
     public override void PostUpdate(GameTime gameTime)
     {
         float dt = (float)gameTime.TotalGameTime.TotalSeconds;
-        SetCircleRadius((float)Math.Sin(dt) * 10f + 50f);
+        // SetCircleRadius((float)Math.Sin(dt) * 10f + 50f);
     }
 
     public override void OnGameResize(GameResizeEvent oldState, GameResizeEvent newState)
@@ -36,7 +36,7 @@ public class ShaderEffectSystem : BroccoAutoSystem
 
     public static void SetCircleRadius(float radius)
     {
-        _shader.Parameters["CircleRadius"].SetValue(radius);
+        _shader.Parameters["CircleRadius"].SetValue(radius * _canvasRenderScale);
     }
 
     public static void SetCircleCanvasPos(Vector2 pos) => SetCirclePos(GetScreenPosForCanvasPos(pos));

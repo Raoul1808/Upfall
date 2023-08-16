@@ -36,6 +36,7 @@ public class Player : TilemapEntity
         IsDead = false;
         WonLevel = false;
         UpfallCommon.OnWorldChange += FlipGravity;
+        LayerDepth = 1f;
     }
 
     private FallDirection GetFallDirection(WorldMode mode)

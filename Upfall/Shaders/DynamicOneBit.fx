@@ -20,9 +20,11 @@ float circle(float radius, float2 circlePos, float2 uv)
 float4 DynamicOneBitFunction(float2 pixelCoord : SV_Position, float2 texCoord : TEXCOORD0) : COLOR0
 {
     float4 texColor = tex2D(TextureSampler, texCoord);
-    float grayscale = (texColor.r + texColor.g + texColor.b) / 3;
+    float grayscale = 0.0;
     if (circle(CircleRadius, CirclePos, pixelCoord) > 0.5)
-        grayscale = 1.0 - grayscale;
+        grayscale = 1.0 - texColor.b;
+    else
+        grayscale = texColor.r;
     return grayscale < 0.5 ? BitColor1 : BitColor2;
 }
 
