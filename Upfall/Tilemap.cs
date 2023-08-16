@@ -33,19 +33,22 @@ public class Tilemap
         _lightTiles = new Tile[size.Height, size.Width];
     }
 
-    public void SetCommonTile(Point pos, TileType tile)
+    public void SetCommonTile(Point pos, TileType tile, Direction direction)
     {
         _tiles[pos.Y, pos.X].TileId = tile;
+        _tiles[pos.Y, pos.X].Direction = direction;
     }
 
-    public void SetDarkTile(Point pos, TileType tile)
+    public void SetDarkTile(Point pos, TileType tile, Direction direction)
     {
         _darkTiles[pos.Y, pos.X].TileId = tile;
+        _darkTiles[pos.Y, pos.X].Direction = direction;
     }
 
-    public void SetLightTile(Point pos, TileType tile)
+    public void SetLightTile(Point pos, TileType tile, Direction direction)
     {
         _lightTiles[pos.Y, pos.X].TileId = tile;
+        _lightTiles[pos.Y, pos.X].Direction = direction;
     }
 
     public void SetSpawn(Point pos)
@@ -91,22 +94,28 @@ public class Tilemap
     public int GetTop() => 0;
     public int GetBottom() => _tilemapSize.Height * TileSize;
 
-    public Rectangle GetTileRect(Point pos, TileType type) => GetTileRect(pos.X, pos.Y, type);
+    public Rectangle GetTileRect(Point pos, Tile tile) => GetTileRect(pos.X, pos.Y, tile);
 
-    public Rectangle GetTileRect(int x, int y, TileType type)
+    public Rectangle GetTileRect(int x, int y, Tile tile) => GetTileRect(x, y, tile.TileId, tile.Direction);
+
+    public Rectangle GetTileRect(int x, int y, TileType tileId, Direction direction)
     {
         const int spikeGap = 10;
-        const int doorGap = 1;
         
-        return type switch
+        return tileId switch
         {
-            TileType.ExitDoor => new Rectangle(x * TileSize + doorGap, y * TileSize + doorGap, TileSize - doorGap * 2, TileSize - doorGap),
-            TileType.UpSpike => new Rectangle(x * TileSize, y * TileSize + spikeGap, TileSize, TileSize - spikeGap),
-            TileType.DownSpike => new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
-            TileType.LeftSpike => new Rectangle(x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
-            TileType.RightSpike => new Rectangle(x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.Spike when direction == Direction.Up => new (x * TileSize, y * TileSize + spikeGap, TileSize, TileSize - spikeGap),
+            TileType.Spike when direction == Direction.Down => new (x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
+            TileType.Spike when direction == Direction.Left => new (x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.Spike when direction == Direction.Right => new (x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
             _ => new(x * TileSize, y * TileSize, TileSize, TileSize),
         };
+    }
+
+    public Rectangle GetExitRect(int x, int y)
+    {
+        const int doorGap = 1;
+        return new(x * TileSize + doorGap, y * TileSize + doorGap, TileSize - doorGap * 2, TileSize - doorGap);
     }
     
     public const int TileSize = 16;
@@ -126,29 +135,32 @@ public class Tilemap
         var lightTiles = new Tile[height, width];
         for (int row = 0; row < size.Height; row++)
         {
-            var line = reader.ReadLine() ?? new string('0', size.Width);
+            var line = reader.ReadLine() ?? new string('0', size.Width * 2);
             
-            for (int col = 0; col < size.Width; col++)
+            for (int col = 0; col < size.Width * 2; col += 2)
             {
-                tiles[row, col].TileId = (TileType)line[col];
+                tiles[row, col / 2].TileId = (TileType)line[col];
+                tiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
         }
         for (int row = 0; row < size.Height; row++)
         {
-            var line = reader.ReadLine() ?? new string('0', size.Width);
+            var line = reader.ReadLine() ?? new string('0', size.Width * 2);
             
-            for (int col = 0; col < size.Width; col++)
+            for (int col = 0; col < size.Width * 2; col += 2)
             {
-                darkTiles[row, col].TileId = (TileType)line[col];
+                darkTiles[row, col / 2].TileId = (TileType)line[col];
+                darkTiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
         }
         for (int row = 0; row < size.Height; row++)
         {
-            var line = reader.ReadLine() ?? new string('0', size.Width);
+            var line = reader.ReadLine() ?? new string('0', size.Width * 2);
             
-            for (int col = 0; col < size.Width; col++)
+            for (int col = 0; col < size.Width * 2; col += 2)
             {
-                lightTiles[row, col].TileId = (TileType)line[col];
+                lightTiles[row, col / 2].TileId = (TileType)line[col];
+                lightTiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
         }
 
@@ -178,7 +190,9 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                writer.Write((char)_tiles[row, col].TileId);
+                var tile = _tiles[row, col];
+                writer.Write((char)tile.TileId);
+                writer.Write((char)tile.Direction);
             }
             writer.WriteLine();
         }
@@ -186,7 +200,9 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                writer.Write((char)_darkTiles[row, col].TileId);
+                var tile = _darkTiles[row, col];
+                writer.Write((char)tile.TileId);
+                writer.Write((char)tile.Direction);
             }
             writer.WriteLine();
         }
@@ -194,7 +210,9 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                writer.Write((char)_lightTiles[row, col].TileId);
+                var tile = _lightTiles[row, col];
+                writer.Write((char)tile.TileId);
+                writer.Write((char)tile.Direction);
             }
             writer.WriteLine();
         }
@@ -206,19 +224,22 @@ public class Tilemap
     
     public void SolveCollisions(TilemapEntity entity)
     {
-        if (entity.GetType() == typeof(Player) && entity.BoundingBox.Intersects(GetTileRect(_endPoint, TileType.ExitDoor)))
+        if (entity.GetType() == typeof(Player) && entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
         {
             // Trigger level win immediately
             ((Player)entity).Win();
             return;  // We don't want to process collisions
         }
+        var isPlayer = entity.GetType() == typeof(Player);
         var pos = entity.Position / TileSize;
         int lx = Math.Max((int)pos.X - 1, 0);
         int ux = Math.Min((int)pos.X + 2, _tiles.GetLength(1) - 1);
         int ly = Math.Max((int)pos.Y - 1, 0);
         int uy = Math.Min((int)pos.Y + 2, _tiles.GetLength(0) - 1);
 
-        var tileRects = new List<Tuple<float, Rectangle>>();
+        var tileRects = new List<Tuple<float, Tile, Rectangle>>();
+
+        bool kill = false;
 
         for (int x = lx; x <= ux; x++)
         {
@@ -226,62 +247,121 @@ public class Tilemap
             {
                 var bbox = entity.BoundingBox;
                 Tile tile = GetTile(x, y);
-                var tileRect = GetTileRect(x, y, tile.TileId);
+                var tileRect = GetTileRect(x, y, tile);
                 if (tile.TileId != 0 && bbox.Intersects(tileRect))
                 {
                     if (tile.TileId.IsLethal())
                     {
-                        entity.Kill();
-                        return;  // Entity is dead, no need to check for collisions
+                        kill = true;
                     }
-                    tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tileRect));
+                    tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tile, tileRect));
                 }
             }
+        }
+
+        if (isPlayer && kill)
+        {
+            entity.Kill();
+            return;
         }
 
         if (tileRects.Count <= 0) return;  // No collision detected?
         
         tileRects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
 
-        foreach (var (_, tileRect) in tileRects)
+        bool shouldCrossPortal = true;  // We don't want the player to cross the portal multiple times per frame
+        
+        foreach (var (_, tile, tileRect) in tileRects)
         {
             // TODO: the collision code REALLY shouldn't be here, but I REALLY NEED to make progress in the game.
             if (!entity.BoundingBox.Intersects(tileRect)) continue;
 
-            var depth = RectangleExtensions.GetIntersectionDepth(entity.BoundingBox, tileRect);
-
-            float xDepthAbs = Math.Abs(depth.X);
-            float yDepthAbs = Math.Abs(depth.Y);
-
-            if (yDepthAbs < xDepthAbs)
+            if (tile.TileId == TileType.Solid)
             {
-                if (entity.TouchedTopOf(tileRect))
+                var depth = RectangleExtensions.GetIntersectionDepth(entity.BoundingBox, tileRect);
+
+                float xDepthAbs = Math.Abs(depth.X);
+                float yDepthAbs = Math.Abs(depth.Y);
+
+                if (yDepthAbs < xDepthAbs)
                 {
-                    entity.Position.Y = tileRect.Top - entity.BoundingBox.Height / 2f;
-                    entity.Velocity.Y = 0;
-                    entity.OnTileTopTouched(tileRect);
+                    if (entity.TouchedTopOf(tileRect))
+                    {
+                        entity.Position.Y = tileRect.Top - entity.BoundingBox.Height / 2f;
+                        entity.Velocity.Y = 0;
+                        entity.OnTileTopTouched(tileRect);
+                    }
+
+                    if (entity.TouchedBottomOf(tileRect))
+                    {
+                        entity.Position.Y = tileRect.Bottom + entity.BoundingBox.Height / 2f;
+                        entity.Velocity.Y = 0;
+                        entity.OnTileBottomTouched(tileRect);
+                    }
                 }
 
-                if (entity.TouchedBottomOf(tileRect))
+                if (entity.TouchedLeftOf(tileRect))
                 {
-                    entity.Position.Y = tileRect.Bottom + entity.BoundingBox.Height / 2f;
-                    entity.Velocity.Y = 0;
-                    entity.OnTileBottomTouched(tileRect);
+                    entity.Position.X = tileRect.Left - entity.BoundingBox.Width / 2f;
+                    entity.Velocity.X = 0;
+                    entity.OnTileLeftTouched(tileRect);
+                }
+
+                if (entity.TouchedRightOf(tileRect))
+                {
+                    entity.Position.X = tileRect.Right + entity.BoundingBox.Width / 2f;
+                    entity.Velocity.X = 0;
+                    entity.OnTileRightTouched(tileRect);
                 }
             }
-            
-            if (entity.TouchedLeftOf(tileRect))
+
+            if (isPlayer && shouldCrossPortal && tile.TileId == TileType.Portal)
             {
-                entity.Position.X = tileRect.Left - entity.BoundingBox.Width / 2f;
-                entity.Velocity.X = 0;
-                entity.OnTileLeftTouched(tileRect);
-            }
-            
-            if (entity.TouchedRightOf(tileRect))
-            {
-                entity.Position.X = tileRect.Right + entity.BoundingBox.Width / 2f;
-                entity.Velocity.X = 0;
-                entity.OnTileRightTouched(tileRect);
+                // This basically boils down to this
+                // 1. Get the player's previous position from his current velocity
+                // 2. Compare the player's previous position and the current position to the portal's center position.
+                // 3. If the player was before the portal in one frame and beyond the portal on the next frame, the player effectively crossed the portal.
+                // 4. If the portal was crossed, do not attempt to cross another portal.
+                
+                Point portalCenter = tileRect.Center;
+                bool crossedPortal = false;
+                float playerPos = 0f;
+                float playerPreVel = 0f;
+                switch (tile.Direction)
+                {
+                    case Direction.Down:
+                        playerPos = entity.Position.Y;
+                        playerPreVel = playerPos - entity.Velocity.Y;
+                        if (playerPreVel < portalCenter.Y && playerPos >= portalCenter.Y)
+                            crossedPortal = true;
+                        break;
+
+                    case Direction.Up:
+                        playerPos = entity.Position.Y;
+                        playerPreVel = playerPos - entity.Velocity.Y;
+                        if (playerPreVel > portalCenter.Y && playerPos <= portalCenter.Y)
+                            crossedPortal = true;
+                        break;
+
+                    case Direction.Left:
+                        playerPos = entity.Position.X;
+                        playerPreVel = playerPos - entity.Velocity.X;
+                        if (playerPreVel > portalCenter.X && playerPos <= portalCenter.X)
+                            crossedPortal = true;
+                        break;
+
+                    case Direction.Right:
+                        playerPos = entity.Position.X;
+                        playerPreVel = playerPos - entity.Velocity.X;
+                        if (playerPreVel < portalCenter.X && playerPos >= portalCenter.X)
+                            crossedPortal = true;
+                        break;
+                }
+                if (crossedPortal)
+                {
+                    UpfallCommon.CycleWorldMode();
+                    shouldCrossPortal = false;
+                }
             }
         }
     }
@@ -303,6 +383,7 @@ public class Tilemap
             RenderLayer(spriteBatch, mode, color);
         }
 
+        RenderTile(spriteBatch, Color.White, _spawnPoint, TileType.Spawn);
         RenderTile(spriteBatch, Color.White, _endPoint, TileType.ExitDoor);
     }
 
@@ -320,26 +401,34 @@ public class Tilemap
             for (int col = 0; col < _tiles.GetLength(1); col++)
             {
                 Tile tile = layer[row, col];
-                RenderTile(spriteBatch, color, new(col, row), tile.TileId);
+                RenderTile(spriteBatch, color, new(col, row), tile);
             }
         }
     }
 
+    public void RenderTile(SpriteBatch spriteBatch, Color color, Point pos, Tile tile)
+    {
+        RenderTile(spriteBatch, color, pos, tile.TileId, tile.Direction);
+    }
+
     public void RenderTile(SpriteBatch spriteBatch, Color color, Point pos, TileType tileId)
+    {
+        RenderTile(spriteBatch, color, pos, tileId, Direction.Right);
+    }
+
+    public void RenderTile(SpriteBatch spriteBatch, Color color, Point pos, TileType tileId, Direction direction)
     {
         if (tileId != TileType.None)
         {
             var tex = tileId.GetTextureForType() ?? Assets.Pixel;
-            var rot = tileId.GetRotationForType();
-            var rect = new Rectangle(pos.X * TileSize, pos.Y * TileSize, TileSize, TileSize);
-            var offset = Vector2.Zero;
-            if (tex != Assets.Pixel)
-            {
-                rect.X += (int)HalfTile.X;
-                rect.Y += (int)HalfTile.Y;
-                offset = HalfTile;
-            }
-            spriteBatch.Draw(tex ?? Assets.Pixel, rect, null, color, rot, offset, SpriteEffects.None, 0f);
+            float rot = tileId.HasDirection() ? direction.ToRotation() : 0f;
+            var rect = GetTileRect(pos.X, pos.Y, TileType.Solid, direction);
+            rect.X += (int)HalfTile.X;
+            rect.Y += (int)HalfTile.Y;
+            var offset = HalfTile;
+
+            Rectangle? srcRect = tileId == TileType.Portal ? AnimationHelper.GetPortalSourceRectangle() : null;
+            spriteBatch.Draw(tex, rect, srcRect, color, -rot, offset, SpriteEffects.None, 0f);
         }
     }
 }

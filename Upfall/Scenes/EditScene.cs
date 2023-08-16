@@ -14,15 +14,14 @@ public class EditScene : Scene
     private Tilemap _tilemap;
     private Size _tilemapSize;
     private Point _currentTilePos;
-    private Player _player;
     private string _levelFilename = "map.umd";
 
     private TileType _currentTileId;
+    private Direction _currentDirection;
     
     public override void Load()
     {
         ClearColor = Color.CornflowerBlue;
-        _player = AddToScene<Player>();
         _tilemap = new Tilemap(_tilemapSize = new Size(40, 23));
         PauseUpdate = true;
     }
@@ -31,7 +30,15 @@ public class EditScene : Scene
     {
         UpfallCommon.CurrentWorldMode = WorldMode.None;
         UpfallCommon.InEditor = true;
+        UpfallCommon.Playtesting = false;
         _currentTileId = TileType.Solid;
+        _currentDirection = Direction.Up;
+    }
+
+    public override void OnBecomeInactive()
+    {
+        UpfallCommon.InEditor = false;
+        UpfallCommon.Playtesting = false;
     }
 
     public override void Update(float dt)
@@ -43,20 +50,21 @@ public class EditScene : Scene
             SceneManager.Change("Menu");
             return;  // Don't execute further
         }
-        
-        if (InputManager.GetKeyPress(Keys.Tab))
-            UpfallCommon.CycleWorldMode();
 
-        _tilemap.SolveCollisions(_player);
+        if (InputManager.GetKeyPress(Keys.Tab))
+        {
+            UpfallCommon.CycleWorldMode();
+            NotificationSystem.SendNotification("Tilemap Selected: " + UpfallCommon.CurrentWorldMode);
+        }
         
         var pos = InputManager.GetCanvasMousePosition();
         int x = BroccoMath.Clamp((int)pos.X / Tilemap.TileSize, 0, _tilemapSize.Width - 1);
         int y = BroccoMath.Clamp((int)pos.Y / Tilemap.TileSize, 0, _tilemapSize.Height - 1);
         _currentTilePos = new Point(x, y);
         if (InputManager.GetClickDown(MouseButtons.Left))
-            SetTile(_currentTilePos, _currentTileId);
+            SetTile(_currentTilePos, _currentTileId, _currentDirection);
         if (InputManager.GetClickDown(MouseButtons.Right))
-            SetTile(_currentTilePos, TileType.None);
+            SetTile(_currentTilePos, TileType.None, _currentDirection);
         if (InputManager.GetClickDown(MouseButtons.Middle))
         {
             if (InputManager.GetKeyDown(Keys.LeftControl))
@@ -66,7 +74,6 @@ public class EditScene : Scene
             else
             {
                 _tilemap.SetSpawn(_currentTilePos);
-                _player.Position = _tilemap.GetSpawnPos();
             }
         }
 
@@ -93,37 +100,89 @@ public class EditScene : Scene
             }
         }
 
-        if (InputManager.GetKeyPress(Keys.Right))
+        if (InputManager.GetKeyPress(Keys.D1))
         {
-            _currentTileId++;
-            if (_currentTileId > TileType.RightSpike)
-                _currentTileId = TileType.Solid;
-            NotificationSystem.SendNotification("Selected tile " + _currentTileId);
+            _currentTileId = TileType.Solid;
+            NotificationSystem.SendNotification("Selected Tile: Solid");
+        }
+
+        if (InputManager.GetKeyPress(Keys.D2))
+        {
+            _currentTileId = TileType.Spike;
+            NotificationSystem.SendNotification("Selected Tile: Spike");
+        }
+
+        if (InputManager.GetKeyPress(Keys.D3))
+        {
+            _currentTileId = TileType.Portal;
+            NotificationSystem.SendNotification("Selected Tile: Portal");
+        }
+
+        if (InputManager.GetKeyPress(Keys.D4))
+        {
+            _currentTileId = TileType.Spawn;
+            NotificationSystem.SendNotification("Selected Tile: Spawn");
+        }
+
+        if (InputManager.GetKeyPress(Keys.D5))
+        {
+            _currentTileId = TileType.ExitDoor;
+            NotificationSystem.SendNotification("Selected Tile: Exit Door");
+        }
+
+        if (InputManager.GetKeyPress(Keys.Up))
+        {
+            _currentDirection = Direction.Up;
+            NotificationSystem.SendNotification("Tile Facing: Up");
+        }
+
+        if (InputManager.GetKeyPress(Keys.Down))
+        {
+            _currentDirection = Direction.Down;
+            NotificationSystem.SendNotification("Tile Facing: Down");
         }
 
         if (InputManager.GetKeyPress(Keys.Left))
         {
-            _currentTileId--;
-            if (_currentTileId <= TileType.None)
-                _currentTileId = TileType.RightSpike;
-            NotificationSystem.SendNotification("Selected tile " + _currentTileId);
+            _currentDirection = Direction.Left;
+            NotificationSystem.SendNotification("Tile Facing: Left");
+        }
+
+        if (InputManager.GetKeyPress(Keys.Right))
+        {
+            _currentDirection = Direction.Right;
+            NotificationSystem.SendNotification("Tile Facing: Right");
         }
     }
 
-    private void SetTile(Point pos, TileType tile)
+    private void SetTile(Point pos, TileType tile, Direction direction)
     {
+        switch (tile)
+        {
+            case TileType.Spawn:
+                _tilemap.SetSpawn(pos);
+                return;
+            
+            case TileType.ExitDoor:
+                _tilemap.SetExit(pos);
+                return;
+        }
+
+        if (tile == TileType.Solid)
+            direction = Direction.Right;
+        
         switch (UpfallCommon.CurrentWorldMode)
         {
             case WorldMode.None:
-                _tilemap.SetCommonTile(pos, tile);
+                _tilemap.SetCommonTile(pos, tile, direction);
                 break;
 
             case WorldMode.Dark:
-                _tilemap.SetDarkTile(pos, tile);
+                _tilemap.SetDarkTile(pos, tile, direction);
                 break;
 
             case WorldMode.Light:
-                _tilemap.SetLightTile(pos, tile);
+                _tilemap.SetLightTile(pos, tile, direction);
                 break;
         }
     }
@@ -131,7 +190,6 @@ public class EditScene : Scene
     public override void CanvasRender(SpriteBatch spriteBatch)
     {
         _tilemap.EditorRender(spriteBatch);
-        _player.Render(spriteBatch);
-        _tilemap.RenderTile(spriteBatch, Color.DimGray * 0.5f, _currentTilePos, _currentTileId);
+        _tilemap.RenderTile(spriteBatch, Color.DimGray * 0.5f, _currentTilePos, _currentTileId, _currentDirection);
     }
 }

@@ -39,8 +39,9 @@ internal class GameScene : Scene
 
     public override void Update(float dt)
     {
+        AnimationHelper.UpdateFrames();
         bool quitting = InputManager.GetKeyPress(Keys.Escape);
-        if (UpfallCommon.InEditor && quitting)
+        if (UpfallCommon.Playtesting && quitting)
         {
             // We're playtesting, go back to the editor
             SceneManager.Change("Editor");

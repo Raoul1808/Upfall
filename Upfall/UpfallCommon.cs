@@ -1,3 +1,5 @@
+using SDL2;
+
 namespace Upfall;
 
 public static class UpfallCommon
@@ -21,13 +23,24 @@ public static class UpfallCommon
 
     public static void CycleWorldMode()
     {
-        if (!InEditor) return;
         var mode = _currentWorldMode;
         mode += 1;
         if (mode > WorldMode.Light)
-            mode = WorldMode.None;
-        _currentWorldMode = mode;
+            mode = InEditor ? WorldMode.None : WorldMode.Dark;
+        CurrentWorldMode = mode;
     }
     
     public static bool InEditor = false;
+    public static bool Playtesting = false;
+    private static float _dt = 0f;
+
+    public static float DeltaTime
+    {
+        get
+        {
+            var dt = _dt;
+            _dt += 0.001f;
+            return dt;
+        }
+    }
 }

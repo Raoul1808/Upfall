@@ -26,6 +26,8 @@ public class MenuScene : Scene
     public override void OnBecomeActive()
     {
         UpfallCommon.InEditor = false;
+        UpfallCommon.Playtesting = false;
+        UpfallCommon.CurrentWorldMode = WorldMode.Dark;
     }
 
     public override void Update(float dt)

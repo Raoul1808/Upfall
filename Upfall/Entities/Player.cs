@@ -35,22 +35,34 @@ public class Player : TilemapEntity
         CurrentTexture = Assets.GetTexture("player");
         IsDead = false;
         WonLevel = false;
+        UpfallCommon.OnWorldChange += FlipGravity;
     }
-    
+
+    private FallDirection GetFallDirection(WorldMode mode)
+    {
+        return mode switch
+        {
+            WorldMode.Dark => FallDirection.Down,
+            WorldMode.Light => FallDirection.Up,
+            _ => FallDirection.Down,
+        };
+    }
+
+    private void FlipGravity(WorldMode oldMode, WorldMode newMode)
+    {
+        _fallDirection = GetFallDirection(newMode);
+        if (_fallDirection == FallDirection.Up)
+            Flip |= SpriteEffects.FlipVertically;
+        if (_fallDirection == FallDirection.Down)
+            Flip &= ~SpriteEffects.FlipVertically;
+    }
+
     public override void Update(float dt)
     {
         bool left = InputManager.GetKeyDown(Keys.Left) || InputManager.GetButtonDown(Buttons.LeftThumbstickLeft);
         bool right = InputManager.GetKeyDown(Keys.Right) || InputManager.GetButtonDown(Buttons.LeftThumbstickRight);
         bool jump = InputManager.GetKeyPress(Keys.Space) || InputManager.GetButtonPress(Buttons.A);
         bool jumping = InputManager.GetKeyDown(Keys.Space) || InputManager.GetButtonDown(Buttons.A);
-        bool flipGravity = InputManager.GetKeyPress(Keys.W) || InputManager.GetButtonPress(Buttons.X);
-
-        if (flipGravity)
-        {
-            _fallDirection = _fallDirection == FallDirection.Down ? FallDirection.Up : FallDirection.Down;
-            UpfallCommon.CurrentWorldMode = _fallDirection == FallDirection.Down ? WorldMode.Dark : WorldMode.Light;
-            Flip ^= SpriteEffects.FlipVertically;
-        }
 
         if (left)
             _targetSpeed = -HorizontalSpeed;
