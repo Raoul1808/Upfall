@@ -11,6 +11,8 @@ internal class GameScene : Scene
 {
     private Player _player;
     private Tilemap _tilemap;
+
+    private bool _flipColor = false;
     
     public override void Load()
     {
@@ -20,6 +22,7 @@ internal class GameScene : Scene
         {
             CanvasEffect.Parameters["BitColor1"].SetValue(Color.Blue.ToVector4());
             CanvasEffect.Parameters["BitColor2"].SetValue(Color.CornflowerBlue.ToVector4());
+            CanvasEffect.Parameters["FlipColors"].SetValue(false);
         }
     }
 
@@ -46,6 +49,11 @@ internal class GameScene : Scene
             // We're playtesting, go back to the editor
             SceneManager.Change("Editor");
             return;  // Don't execute further
+        }
+
+        if (InputManager.GetKeyPress(Keys.Enter))
+        {
+            CanvasEffect?.Parameters["FlipColors"].SetValue(_flipColor = !_flipColor);
         }
         
         if (quitting)
