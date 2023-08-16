@@ -1,5 +1,3 @@
-using SDL2;
-
 namespace Upfall;
 
 public static class UpfallCommon
@@ -32,15 +30,4 @@ public static class UpfallCommon
     
     public static bool InEditor = false;
     public static bool Playtesting = false;
-    private static float _dt = 0f;
-
-    public static float DeltaTime
-    {
-        get
-        {
-            var dt = _dt;
-            _dt += 0.001f;
-            return dt;
-        }
-    }
 }
