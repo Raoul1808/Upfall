@@ -72,6 +72,7 @@ public class ShaderEffectSystem : BroccoAutoSystem
 
     public static void SetCircleRadiusAnim(float startRadius, float targetRadius)
     {
+        if (Math.Abs(_targetCircleSize - targetRadius) < 0.0001f) return;
         _circleTimer = 0f;
         _startCircleSize = startRadius;
         _targetCircleSize = targetRadius;

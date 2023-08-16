@@ -14,6 +14,8 @@ internal class GameScene : Scene
 
     private Color color1 = Color.Blue;
     private Color color2 = Color.Yellow;
+
+    private bool _waitForEndParticles = false;
     
     public override void Load()
     {
@@ -29,6 +31,7 @@ internal class GameScene : Scene
 
     public override void OnBecomeActive()
     {
+        _waitForEndParticles = false;
         UpfallCommon.OnWorldChange += SetCircleAnim;
         _tilemap = Tilemap.LoadFromFile("map.umd");
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
@@ -60,6 +63,7 @@ internal class GameScene : Scene
     public override void Update(float dt)
     {
         AnimationHelper.UpdateFrames();
+        ParticleSystem.UpdateParticles(dt);
         bool quitting = InputManager.GetKeyPress(Keys.Escape);
         if (UpfallCommon.Playtesting && quitting)
         {
@@ -75,33 +79,46 @@ internal class GameScene : Scene
             SceneManager.Change("Menu");
             return;  // Don't execute further
         }
+
+        if (_waitForEndParticles && ParticleSystem.DeathParticlesDone())
+        {
+            SceneManager.Change("Game");
+            return;
+        }
         
         // TODO: add more gentle transitions
-        if (_player.IsDead || _player.WonLevel)
+        if (!_waitForEndParticles && (_player.IsDead || _player.WonLevel))
         {
-            SceneManager.Reload("Game");
+            _waitForEndParticles = true;
+            UpfallCommon.CurrentWorldMode = WorldMode.Dark;
             return;  // Don't execute further
         }
-        
-        // Prevent player from going out of screen
-        if (_player.BoundingBox.Left < _tilemap.GetLeft())
+
+        if (!_player.IsDead)
         {
-            _player.Position.X = _tilemap.GetLeft() + _player.BoundingBox.Width / 2f;
+            // Prevent player from going out of screen
+            if (_player.BoundingBox.Left < _tilemap.GetLeft())
+            {
+                _player.Position.X = _tilemap.GetLeft() + _player.BoundingBox.Width / 2f;
+            }
+
+            if (_player.BoundingBox.Right > _tilemap.GetRight())
+            {
+                _player.Position.X = _tilemap.GetRight() - _player.BoundingBox.Width / 2f;
+            }
+
+            // If player is OOB, kill him
+            if (_player.BoundingBox.Top > _tilemap.GetBottom() || _player.BoundingBox.Bottom < _tilemap.GetTop())
+            {
+                _player.Kill();
+            }
         }
 
-        if (_player.BoundingBox.Right > _tilemap.GetRight())
-        {
-            _player.Position.X = _tilemap.GetRight() - _player.BoundingBox.Width / 2f;
-        }
-        
-        // If player is OOB, kill him
-        if (_player.BoundingBox.Top > _tilemap.GetBottom() || _player.BoundingBox.Bottom < _tilemap.GetTop())
-        {
-            _player.Kill();
-        }
-        
+
         base.Update(dt);
-        _tilemap.SolveCollisions(_player);
+        
+        if (!_player.IsDead)
+            _tilemap.SolveCollisions(_player);
 
         ColorUtil.IncreaseHueBy(ref color1, 1, out _);
         ColorUtil.IncreaseHueBy(ref color2, 1, out _);
@@ -116,5 +133,6 @@ internal class GameScene : Scene
     {
         base.CanvasRender(spriteBatch);
         _tilemap.Render(spriteBatch);
+        ParticleSystem.RenderParticles(spriteBatch);
     }
 }

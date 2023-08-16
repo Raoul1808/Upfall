@@ -146,6 +146,7 @@ public class Player : TilemapEntity
     {
         // 🦀 The player is dead 🦀
         IsDead = true;
+        ParticleSystem.SpawnDeathParticles(Position);
         Dispose();
     }
 
