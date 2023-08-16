@@ -44,7 +44,7 @@ public class EditScene : Scene
     public override void OnBecomeInactive()
     {
         UpfallCommon.InEditor = false;
-        UpfallCommon.Playtesting = false;
+        UpfallCommon.Playtesting = true;
     }
 
     public override void Update(float dt)
