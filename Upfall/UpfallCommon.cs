@@ -1,3 +1,6 @@
+using System.IO;
+using System.Reflection;
+
 namespace Upfall;
 
 public static class UpfallCommon
@@ -30,4 +33,8 @@ public static class UpfallCommon
     
     public static bool InEditor = false;
     public static bool Playtesting = false;
+
+    public static readonly string GamePath = Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? "";
+
+    public static readonly string TilesPath = Path.Join(GamePath, "Content", "Maps");
 }

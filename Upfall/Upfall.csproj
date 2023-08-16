@@ -16,4 +16,14 @@
         </Content>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Folder Include="Content\Maps\" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <PackageReference Include="NativeFileDialogSharp" Version="0.5.0" />
+    </ItemGroup>
+
 </Project>

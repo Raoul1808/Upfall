@@ -7,6 +7,7 @@ using Brocco.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NativeFileDialogSharp;
 
 namespace Upfall.Scenes;
 
@@ -15,7 +16,7 @@ public class EditScene : Scene
     private Tilemap _tilemap;
     private Size _tilemapSize;
     private Point _currentTilePos;
-    private string _levelFilename = "map.umd";
+    private string _levelFilename = string.Empty;
 
     private MenuObject _editorMenu;
     private bool _showEditorMenu = false;
@@ -34,7 +35,6 @@ public class EditScene : Scene
         _editorMenu = MenuBuilder.CreateMenu(Assets.GetFontSystem("Open Sans"), new Vector2(200), menuSettings)
             .AddButton("Resume", _ => _showEditorMenu = false)
             .AddTextInput("Level Name")
-            .AddTextInput("Level Filename", "map.umd", (_, str) => _levelFilename = str)
             .AddButton("Exit to Menu", _ =>
             {
                 SceneManager.Change("Menu");
@@ -46,6 +46,7 @@ public class EditScene : Scene
     private void CreateBlankTilemap()
     {
         _tilemap = new Tilemap(_tilemapSize = new Size(40, 23));
+        _levelFilename = string.Empty;
     }
 
     public override void OnBecomeActive()
@@ -106,21 +107,41 @@ public class EditScene : Scene
         {
             if (InputManager.GetKeyPress(Keys.S))
             {
-                _tilemap.SaveToFile(_levelFilename);
-                NotificationSystem.SendNotification("Saved Level to " + _levelFilename);
+                DialogResult res;
+                if ((_levelFilename == string.Empty || InputManager.GetKeyDown(Keys.LeftShift)) &&
+                    (res = Dialog.FileSave("umd", UpfallCommon.GamePath)).IsOk)
+                {
+                    _levelFilename = res.Path;
+                }
+
+                if (_levelFilename == string.Empty)
+                    NotificationSystem.SendNotification("Cannot save: path not set");
+                else
+                {
+                    _tilemap.SaveToFile(_levelFilename);
+                    NotificationSystem.SendNotification("Saved Level to " + _levelFilename);
+                }
             }
 
             if (InputManager.GetKeyPress(Keys.O))
             {
+                DialogResult res = Dialog.FileOpen("umd", UpfallCommon.GamePath);
+                if (!res.IsOk)
+                    NotificationSystem.SendNotification("Open File Request Cancelled.");
                 try
                 {
-                    var tilemap = Tilemap.LoadFromFile(_levelFilename);
+                    var tilemap = Tilemap.LoadFromFile(res.Path);
                     _tilemap = tilemap;
-                    NotificationSystem.SendNotification("Loaded Level from " + _levelFilename);
+                    NotificationSystem.SendNotification("Loaded Level from " + res.Path);
+                    _levelFilename = res.Path;
                 }
                 catch (IOException)
                 {
                     NotificationSystem.SendNotification("Level " + _levelFilename + " doesn't exist");
+                }
+                catch (Exception)
+                {
+                    NotificationSystem.SendNotification("Not a valid map");
                 }
             }
 
