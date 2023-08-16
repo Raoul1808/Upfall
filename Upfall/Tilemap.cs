@@ -157,8 +157,8 @@ public class Tilemap
         {
             TileType.Spike when direction == Direction.Up => new (x * TileSize, y * TileSize + spikeGap, TileSize, TileSize - spikeGap),
             TileType.Spike when direction == Direction.Down => new (x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
-            TileType.Spike when direction == Direction.Left => new (x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
-            TileType.Spike when direction == Direction.Right => new (x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.Spike when direction == Direction.Left => new (x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.Spike when direction == Direction.Right => new (x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
             TileType.Key => new (x * TileSize + 5, y * TileSize + 2, TileSize - 6, TileSize - 2),
             _ => new(x * TileSize, y * TileSize, TileSize, TileSize),
         };
