@@ -40,7 +40,6 @@ public class ShaderEffectSystem : BroccoAutoSystem
             _circleTimer += dt;
             _currentCircleSize = MathHelper.Lerp(_startCircleSize, _targetCircleSize, (float)EaseOutQuart(_circleTimer / CircleTransitionTime));
         }
-        Console.WriteLine(_circleTimer);
         _circleWobbleSize = (float)Math.Sin(tt) * wobbleAmount - wobbleAmount;
         SetCircleRadius(_currentCircleSize + _circleWobbleSize);
     }
