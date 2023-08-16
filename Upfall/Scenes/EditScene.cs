@@ -132,11 +132,17 @@ public class EditScene : Scene
 
         if (InputManager.GetKeyPress(Keys.D4))
         {
+            _currentTileId = TileType.Key;
+            NotificationSystem.SendNotification("Selected Tile: Key");
+        }
+
+        if (InputManager.GetKeyPress(Keys.D5))
+        {
             _currentTileId = TileType.Spawn;
             NotificationSystem.SendNotification("Selected Tile: Spawn");
         }
 
-        if (InputManager.GetKeyPress(Keys.D5))
+        if (InputManager.GetKeyPress(Keys.D6))
         {
             _currentTileId = TileType.ExitDoor;
             NotificationSystem.SendNotification("Selected Tile: Exit Door");

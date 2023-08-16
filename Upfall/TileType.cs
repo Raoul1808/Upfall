@@ -10,7 +10,9 @@ public enum TileType : byte
     Solid,
     Spike,
     Portal,
+    Key,
     Spawn,  // Used only for editor
+    LockedDoor,  // Used only for visuals
     ExitDoor,
 }
 
@@ -23,9 +25,11 @@ public static class TileTypeExtensions
             TileType.Solid => Assets.GetTexture("tile"),
             TileType.Spike => Assets.GetTexture("spike"),
             TileType.ExitDoor => Assets.GetTexture("door"),
+            TileType.LockedDoor => Assets.GetTexture("door_locked"),
             TileType.Spawn => Assets.GetTexture("player"),
             TileType.Portal when UpfallCommon.InEditor => Assets.GetTexture("portal_editor"),
             TileType.Portal when !UpfallCommon.InEditor => Assets.GetTexture("portal_anim"),
+            TileType.Key => Assets.GetTexture("key"),
             _ => null
         };
     }
@@ -40,6 +44,7 @@ public static class TileTypeExtensions
             TileType.Portal => true,
             TileType.Spawn => false,
             TileType.ExitDoor => false,
+            TileType.Key => false,
             _ => false,
         };
     }

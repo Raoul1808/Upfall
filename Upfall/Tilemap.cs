@@ -19,6 +19,8 @@ public class Tilemap
     private Point _spawnPoint;
     private Point _endPoint;
 
+    private int _keyCount;
+
     public Vector2 HalfTile => new(TileSize / 2f);
 
     private Tilemap()
@@ -31,6 +33,7 @@ public class Tilemap
         _tiles = new Tile[size.Height, size.Width];
         _darkTiles = new Tile[size.Height, size.Width];
         _lightTiles = new Tile[size.Height, size.Width];
+        _keyCount = 0;
     }
 
     public void SetCommonTile(Point pos, TileType tile, Direction direction)
@@ -85,6 +88,54 @@ public class Tilemap
         return tile;
     }
 
+    public void RemoveKey(int x, int y)
+    {
+        if (_keyCount <= 0)
+            return;  // There are no keys left in the level. Return
+        WorldMode mode;
+        Tile tile = GetTileCommon(x, y);
+        if (tile.TileId != TileType.Key)
+        {
+            // Key not found in common tiles, search further
+            switch (UpfallCommon.CurrentWorldMode)
+            {
+                case WorldMode.Dark:
+                    tile = GetTileDark(x, y);
+                    break;
+
+                case WorldMode.Light:
+                    tile = GetTileLight(x, y);
+                    break;
+            }
+
+            mode = UpfallCommon.CurrentWorldMode;
+
+            if (tile.TileId != TileType.Key)
+            {
+                // Key not found. Break
+                return;
+            }
+        }
+        else
+            mode = WorldMode.None;
+
+        _keyCount--;
+        switch (mode)
+        {
+            case WorldMode.None:
+                SetCommonTile(new(x, y), TileType.None, Direction.Left);
+                break;
+
+            case WorldMode.Dark:
+                SetDarkTile(new(x, y), TileType.None, Direction.Left);
+                break;
+
+            case WorldMode.Light:
+                SetLightTile(new(x, y), TileType.None, Direction.Left);
+                break;
+        }
+    }
+
     public Vector2 GetSpawnPos() => GetTilePos(_spawnPoint).ToVector2() + HalfTile;
 
     public Point GetTilePos(Point pos) => new(pos.X * TileSize, pos.Y * TileSize);
@@ -108,6 +159,7 @@ public class Tilemap
             TileType.Spike when direction == Direction.Down => new (x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
             TileType.Spike when direction == Direction.Left => new (x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
             TileType.Spike when direction == Direction.Right => new (x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.Key => new (x * TileSize + 5, y * TileSize + 2, TileSize - 6, TileSize - 2),
             _ => new(x * TileSize, y * TileSize, TileSize, TileSize),
         };
     }
@@ -133,13 +185,17 @@ public class Tilemap
         var tiles = new Tile[height, width];
         var darkTiles = new Tile[height, width];
         var lightTiles = new Tile[height, width];
+        int keyCount = 0;
         for (int row = 0; row < size.Height; row++)
         {
             var line = reader.ReadLine() ?? new string('0', size.Width * 2);
             
             for (int col = 0; col < size.Width * 2; col += 2)
             {
-                tiles[row, col / 2].TileId = (TileType)line[col];
+                var tileId = (TileType)line[col];
+                if (tileId == TileType.Key)
+                    keyCount++;
+                tiles[row, col / 2].TileId = tileId;
                 tiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
         }
@@ -174,6 +230,7 @@ public class Tilemap
             _tilemapSize = size,
             _spawnPoint = new(startX, startY),
             _endPoint = new(endX, endY),
+            _keyCount = keyCount,
         };
     }
     
@@ -224,13 +281,13 @@ public class Tilemap
     
     public void SolveCollisions(TilemapEntity entity)
     {
-        if (entity.GetType() == typeof(Player) && entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
+        var isPlayer = entity.GetType() == typeof(Player);
+        if (_keyCount <= 0 && isPlayer && entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
         {
             // Trigger level win immediately
             ((Player)entity).Win();
             return;  // We don't want to process collisions
         }
-        var isPlayer = entity.GetType() == typeof(Player);
         var pos = entity.Position / TileSize;
         int lx = Math.Max((int)pos.X - 1, 0);
         int ux = Math.Min((int)pos.X + 2, _tiles.GetLength(1) - 1);
@@ -250,6 +307,12 @@ public class Tilemap
                 var tileRect = GetTileRect(x, y, tile);
                 if (tile.TileId != 0 && bbox.Intersects(tileRect))
                 {
+                    if (isPlayer && tile.TileId == TileType.Key)
+                    {
+                        RemoveKey(x, y);
+                        continue;  // Collect the key and restart collision checking
+                    }
+                    
                     if (tile.TileId.IsLethal())
                     {
                         kill = true;
@@ -420,6 +483,8 @@ public class Tilemap
     {
         if (tileId != TileType.None)
         {
+            if (!UpfallCommon.InEditor && tileId == TileType.ExitDoor && _keyCount > 0)
+                tileId = TileType.LockedDoor;
             var tex = tileId.GetTextureForType() ?? Assets.Pixel;
             float rot = tileId.HasDirection() ? direction.ToRotation() : 0f;
             var rect = GetTileRect(pos.X, pos.Y, TileType.Solid, direction);
