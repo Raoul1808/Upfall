@@ -26,6 +26,7 @@ internal class GameScene : Scene
 
     public override void OnBecomeActive()
     {
+        UpfallCommon.OnWorldChange += SetCircleAnim;
         _tilemap = Tilemap.LoadFromFile("map.umd");
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
         _player = AddToScene<Player>();
@@ -36,6 +37,21 @@ internal class GameScene : Scene
     public override void OnBecomeInactive()
     {
         RemoveFromScene(_player);  // Avoid duplicates when loading back into the scene
+        UpfallCommon.OnWorldChange -= SetCircleAnim;
+    }
+
+    private void SetCircleAnim(WorldMode oldMode, WorldMode newMode)
+    {
+        switch (newMode)
+        {
+            case WorldMode.Dark:
+                ShaderEffectSystem.SetCircleRadiusAnim(200f, 0f);
+                break;
+            
+            case WorldMode.Light:
+                ShaderEffectSystem.SetCircleRadiusAnim(0f, 200f);
+                break;
+        }
     }
 
     public override void Update(float dt)
@@ -84,7 +100,6 @@ internal class GameScene : Scene
         base.Update(dt);
         _tilemap.SolveCollisions(_player);
         ShaderEffectSystem.SetCircleCanvasPos(_player.Position);
-        ShaderEffectSystem.SetCircleRadius(UpfallCommon.CurrentWorldMode == WorldMode.Dark ? 0f : 150f);
     }
 
     public override void CanvasRender(SpriteBatch spriteBatch)
