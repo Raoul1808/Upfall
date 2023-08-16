@@ -22,12 +22,18 @@ public class EditScene : Scene
     public override void Load()
     {
         ClearColor = Color.CornflowerBlue;
-        _tilemap = new Tilemap(_tilemapSize = new Size(40, 23));
         PauseUpdate = true;
+    }
+
+    private void CreateBlankTilemap()
+    {
+        _tilemap = new Tilemap(_tilemapSize = new Size(40, 23));
     }
 
     public override void OnBecomeActive()
     {
+        if (!UpfallCommon.Playtesting)
+            CreateBlankTilemap();
         UpfallCommon.CurrentWorldMode = WorldMode.None;
         UpfallCommon.InEditor = true;
         UpfallCommon.Playtesting = false;
@@ -82,13 +88,13 @@ public class EditScene : Scene
             if (InputManager.GetKeyPress(Keys.S))
             {
                 _tilemap.SaveToFile(_levelFilename);
-                NotificationSystem.SendNotification("Saved Level");
+                NotificationSystem.SendNotification("Saved Level to " + _levelFilename);
             }
 
             if (InputManager.GetKeyPress(Keys.O))
             {
                 _tilemap = Tilemap.LoadFromFile(_levelFilename);
-                NotificationSystem.SendNotification("Loaded Level");
+                NotificationSystem.SendNotification("Loaded Level from " + _levelFilename);
             }
 
             if (InputManager.GetKeyPress(Keys.T))
@@ -97,6 +103,12 @@ public class EditScene : Scene
                 SceneManager.Change("Game");
                 NotificationSystem.SendNotification("Now playing level " + _levelFilename);
                 return;  // Don't execute further
+            }
+
+            if (InputManager.GetKeyPress(Keys.N))
+            {
+                CreateBlankTilemap();
+                NotificationSystem.SendNotification("Creating new level");
             }
         }
 
