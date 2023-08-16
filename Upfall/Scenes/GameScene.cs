@@ -11,6 +11,9 @@ internal class GameScene : Scene
 {
     private Player _player;
     private Tilemap _tilemap;
+
+    private Color color1 = Color.Blue;
+    private Color color2 = Color.Yellow;
     
     public override void Load()
     {
@@ -99,6 +102,13 @@ internal class GameScene : Scene
         
         base.Update(dt);
         _tilemap.SolveCollisions(_player);
+
+        ColorUtil.IncreaseHueBy(ref color1, 1, out _);
+        ColorUtil.IncreaseHueBy(ref color2, 1, out _);
+
+        ShaderEffectSystem.SetDarkColor(color1);
+        ShaderEffectSystem.SetLightColor(color2);
+        
         ShaderEffectSystem.SetCircleCanvasPos(_player.Position);
     }
 

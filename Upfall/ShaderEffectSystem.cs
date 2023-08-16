@@ -61,6 +61,16 @@ public class ShaderEffectSystem : BroccoAutoSystem
         _shader.Parameters["CircleRadius"].SetValue(radius * _canvasRenderScale);
     }
 
+    public static void SetDarkColor(Color color)
+    {
+        _shader.Parameters["BitColor1"].SetValue(color.ToVector4());
+    }
+
+    public static void SetLightColor(Color color)
+    {
+        _shader.Parameters["BitColor2"].SetValue(color.ToVector4());
+    }
+
     public static void SetCircleRadiusAnim(float startRadius, float targetRadius)
     {
         _circleTimer = 0f;
