@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using Brocco;
 using Brocco.Basic;
 using Brocco.Input;
+using Brocco.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,6 +17,9 @@ public class EditScene : Scene
     private Point _currentTilePos;
     private string _levelFilename = "map.umd";
 
+    private MenuObject _editorMenu;
+    private bool _showEditorMenu = false;
+
     private TileType _currentTileId;
     private Direction _currentDirection;
     
@@ -22,6 +27,20 @@ public class EditScene : Scene
     {
         ClearColor = Color.CornflowerBlue;
         PauseUpdate = true;
+        var menuSettings = new MenuSettings
+        {
+            FontSize = 32,
+        };
+        _editorMenu = MenuBuilder.CreateMenu(Assets.GetFontSystem("Open Sans"), new Vector2(200), menuSettings)
+            .AddButton("Resume", _ => _showEditorMenu = false)
+            .AddTextInput("Level Name")
+            .AddTextInput("Level Filename", "map.umd", (_, str) => _levelFilename = str)
+            .AddButton("Exit to Menu", _ =>
+            {
+                SceneManager.Change("Menu");
+                _showEditorMenu = false;
+            })
+            .Build();
     }
 
     private void CreateBlankTilemap()
@@ -49,11 +68,12 @@ public class EditScene : Scene
     public override void Update(float dt)
     {
         if (InputManager.GetKeyPress(Keys.Escape))
+            _showEditorMenu = !_showEditorMenu;
+        
+        if (_showEditorMenu)
         {
-            // We want to go back to the main menu for now
-            // TODO: add editor menu metadata options thing
-            SceneManager.Change("Menu");
-            return;  // Don't execute further
+            _editorMenu.Update();
+            return;
         }
 
         if (InputManager.GetKeyPress(Keys.Tab))
@@ -92,8 +112,16 @@ public class EditScene : Scene
 
             if (InputManager.GetKeyPress(Keys.O))
             {
-                _tilemap = Tilemap.LoadFromFile(_levelFilename);
-                NotificationSystem.SendNotification("Loaded Level from " + _levelFilename);
+                try
+                {
+                    var tilemap = Tilemap.LoadFromFile(_levelFilename);
+                    _tilemap = tilemap;
+                    NotificationSystem.SendNotification("Loaded Level from " + _levelFilename);
+                }
+                catch (IOException)
+                {
+                    NotificationSystem.SendNotification("Level " + _levelFilename + " doesn't exist");
+                }
             }
 
             if (InputManager.GetKeyPress(Keys.T))
@@ -208,5 +236,11 @@ public class EditScene : Scene
     {
         _tilemap.EditorRender(spriteBatch);
         _tilemap.RenderTile(spriteBatch, Color.DimGray * 0.5f, _currentTilePos, _currentTileId, _currentDirection);
+    }
+
+    public override void ScreenRender(SpriteBatch spriteBatch)
+    {
+        if (_showEditorMenu)
+            _editorMenu.Render(spriteBatch);
     }
 }
