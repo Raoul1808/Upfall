@@ -1,33 +1,35 @@
 texture ScreenTexture;
 
+float2 CirclePos;
+float CircleRadius;
+
 float4 BitColor1;
 float4 BitColor2;
-
-bool FlipColors;
 
 sampler TextureSampler = sampler_state
 {
     Texture = <ScreenTexture>;
 };
 
-float3 InvertArea(float3 col)
+float circle(float radius, float2 circlePos, float2 uv)
 {
-    return float3(1.0, 1.0, 1.0) - col;
+    float value = distance(uv, circlePos);
+    return step(value, radius);
 }
 
-float4 DynamicOneBitFunction(float2 TextureCoordinate : TEXCOORD0) : COLOR0
+float4 DynamicOneBitFunction(float2 pixelCoord : SV_Position, float2 texCoord : TEXCOORD0) : COLOR0
 {
-    float4 color = tex2D(TextureSampler, TextureCoordinate);
-    if (FlipColors)
-        color.rgb = InvertArea(color.rgb);
-    float value = (color.r + color.g + color.b) / 3;
-    return value < 0.5 ? BitColor1 : BitColor2;
+    float4 texColor = tex2D(TextureSampler, texCoord);
+    float grayscale = (texColor.r + texColor.g + texColor.b) / 3;
+    if (circle(CircleRadius, CirclePos, pixelCoord) > 0.5)
+        grayscale = 1.0 - grayscale;
+    return grayscale < 0.5 ? BitColor1 : BitColor2;
 }
 
 technique DynamicOneBit
 {
     pass Pass1
     {
-        PixelShader = compile ps_2_0 DynamicOneBitFunction();
+        PixelShader = compile ps_3_0 DynamicOneBitFunction();
     }
 }

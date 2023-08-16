@@ -1,11 +1,10 @@
+using System;
 using Brocco;
 using Brocco.Basic;
 using Brocco.Input;
-using Brocco.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Upfall.Entities;
 
 namespace Upfall.Scenes;
 
@@ -64,8 +63,8 @@ public class EditScene : Scene
         }
         
         var pos = InputManager.GetCanvasMousePosition();
-        int x = BroccoMath.Clamp((int)pos.X / Tilemap.TileSize, 0, _tilemapSize.Width - 1);
-        int y = BroccoMath.Clamp((int)pos.Y / Tilemap.TileSize, 0, _tilemapSize.Height - 1);
+        int x = Math.Clamp((int)pos.X / Tilemap.TileSize, 0, _tilemapSize.Width - 1);
+        int y = Math.Clamp((int)pos.Y / Tilemap.TileSize, 0, _tilemapSize.Height - 1);
         _currentTilePos = new Point(x, y);
         if (InputManager.GetClickDown(MouseButtons.Left))
             SetTile(_currentTilePos, _currentTileId, _currentDirection);

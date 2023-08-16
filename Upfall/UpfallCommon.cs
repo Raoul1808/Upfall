@@ -1,3 +1,5 @@
+using Brocco.Basic;
+
 namespace Upfall;
 
 public static class UpfallCommon
@@ -30,4 +32,6 @@ public static class UpfallCommon
     
     public static bool InEditor = false;
     public static bool Playtesting = false;
+
+    public static Size CanvasSize;
 }
