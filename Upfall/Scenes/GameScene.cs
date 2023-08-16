@@ -18,8 +18,8 @@ internal class GameScene : Scene
         CanvasEffect = Assets.GetEffect("DynamicOneBit");
         if (CanvasEffect != null)
         {
-            CanvasEffect.Parameters["BitColor1"].SetValue(Color.DarkRed.ToVector4());
-            CanvasEffect.Parameters["BitColor2"].SetValue(Color.OrangeRed.ToVector4());
+            CanvasEffect.Parameters["BitColor1"].SetValue(Color.Blue.ToVector4());
+            CanvasEffect.Parameters["BitColor2"].SetValue(Color.CornflowerBlue.ToVector4());
         }
     }
 
