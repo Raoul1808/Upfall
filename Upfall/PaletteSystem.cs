@@ -185,10 +185,10 @@ public class PaletteSystem : BroccoAutoSystem
         ShaderEffectSystem.SetLightColor(currentLight);
     }
 
-    public static void SetPalette(IPalette palette)
+    public static void SetPalette(IPalette palette, float time = 1f)
     {
         if (_currentPalette.Equals(palette)) return;  // We don't want to re-set the palette
-        _paletteTimer = 1f;
+        _paletteTimer = time;
         _lastDarkColor = _currentPalette.DarkColor;
         _lastLightColor = _currentPalette.LightColor;
         _currentPalette = palette;
