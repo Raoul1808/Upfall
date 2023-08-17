@@ -256,10 +256,10 @@ public class Tilemap
     private static IPalette LoadPalette(StreamReader reader)
     {
         string line = reader.ReadLine();
-        int palette = line?[0] ?? -1;
+        PaletteType palette = (PaletteType)(line?[0] ?? -1);
         switch (palette)
         {
-            case 0:  // Simple palette
+            case PaletteType.Simple:
                 string dark = reader.ReadLine();
                 string light = reader.ReadLine();
                 return new SimplePalette
@@ -267,19 +267,19 @@ public class Tilemap
                     DarkColor = ColorUtil.HexToCol(dark),
                     LightColor = ColorUtil.HexToCol(light),
                 };
-            case 1:  // Lerp palette
+            case PaletteType.Lerp:
                 string dark1 = reader.ReadLine();
                 string dark2 = reader.ReadLine();
                 string light1 = reader.ReadLine();
                 string light2 = reader.ReadLine();
-                return new LerpPalette()
+                return new LerpPalette
                 {
                     DarkColor1 = ColorUtil.HexToCol(dark1),
                     DarkColor2 = ColorUtil.HexToCol(dark2),
                     LightColor1 = ColorUtil.HexToCol(light1),
                     LightColor2 = ColorUtil.HexToCol(light2),
                 };
-            case 2:  // Trippy palette
+            case PaletteType.Trippy:
                 return new TrippyPalette();
             
             default:
@@ -289,9 +289,9 @@ public class Tilemap
 
     private void SavePalette(StreamWriter writer)
     {
+        writer.WriteLine((char)LevelPalette.PaletteType);
         if (LevelPalette is SimplePalette simple)
         {
-            writer.WriteLine((char)0);  // Palette Type: Simple
             writer.WriteLine(ColorUtil.ColToHex(simple.DarkColor));
             writer.WriteLine(ColorUtil.ColToHex(simple.LightColor));
             return;
@@ -299,7 +299,6 @@ public class Tilemap
 
         if (LevelPalette is LerpPalette lerp)
         {
-            writer.WriteLine((char)1);  // Palette Type: Lerp
             writer.WriteLine(ColorUtil.ColToHex(lerp.DarkColor1));
             writer.WriteLine(ColorUtil.ColToHex(lerp.DarkColor2));
             writer.WriteLine(ColorUtil.ColToHex(lerp.LightColor1));
@@ -309,7 +308,7 @@ public class Tilemap
 
         if (LevelPalette is TrippyPalette)
         {
-            writer.WriteLine((char)2);  // Palette Type : Trippy
+            // Nothing configurable on the trippy palette
             return;
         }
     }

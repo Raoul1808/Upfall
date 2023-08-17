@@ -6,13 +6,23 @@ namespace Upfall;
 
 public interface IPalette
 {
+    PaletteType PaletteType { get; }
     Color DarkColor { get; }
     Color LightColor { get; }
     void UpdateColors(float dt);
 }
 
+public enum PaletteType
+{
+    Simple,
+    Lerp,
+    Trippy,
+}
+
 public readonly struct SimplePalette : IPalette
 {
+    public PaletteType PaletteType => PaletteType.Simple;
+    
     public Color DarkColor { get; init; }
     public Color LightColor { get; init; }
     
@@ -48,6 +58,8 @@ public readonly struct SimplePalette : IPalette
 
 public struct LerpPalette : IPalette
 {
+    public PaletteType PaletteType => PaletteType.Lerp;
+
     private Color _lerpColor1;
     private Color _lerpColor2;
     
@@ -114,6 +126,8 @@ public struct LerpPalette : IPalette
 
 public struct TrippyPalette : IPalette
 {
+    public PaletteType PaletteType => PaletteType.Trippy;
+
     private Color _color1;
     private Color _color2;
 
@@ -195,4 +209,6 @@ public class PaletteSystem : BroccoAutoSystem
     }
 
     public static IPalette GetDefaultPalette() => new SimplePalette { DarkColor = Color.Black, LightColor = Color.White };
+
+    public static IPalette GetDefaultLerpPalette() => new LerpPalette { DarkColor1 = Color.Black, DarkColor2 = Color.Black, LightColor1 = Color.White, LightColor2 = Color.White };
 }
