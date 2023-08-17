@@ -205,6 +205,9 @@ public class Tilemap
             
             for (int col = 0; col < size.Width * 2; col += 2)
             {
+                var tileId = (TileType)line[col];
+                if (tileId == TileType.Key)
+                    keyCount++;
                 darkTiles[row, col / 2].TileId = (TileType)line[col];
                 darkTiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
@@ -215,6 +218,9 @@ public class Tilemap
             
             for (int col = 0; col < size.Width * 2; col += 2)
             {
+                var tileId = (TileType)line[col];
+                if (tileId == TileType.Key)
+                    keyCount++;
                 lightTiles[row, col / 2].TileId = (TileType)line[col];
                 lightTiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
