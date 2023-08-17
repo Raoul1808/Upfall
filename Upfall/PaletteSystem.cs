@@ -95,9 +95,8 @@ public struct LerpPalette : IPalette
 
     public bool Equals(LerpPalette other)
     {
-        // TODO: why no work :(
         return DarkColor1.Equals(other.DarkColor1) &&
-               DarkColor2.Equals(other.DarkColor1) &&
+               DarkColor2.Equals(other.DarkColor2) &&
                LightColor1.Equals(other.LightColor1) &&
                LightColor2.Equals(other.LightColor2);
     }
