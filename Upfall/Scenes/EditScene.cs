@@ -354,7 +354,7 @@ public class EditScene : Scene
 
             if (InputManager.GetKeyPress(Keys.N))
             {
-                CreateBlankTilemap();
+                RefreshEditor();
                 NotificationSystem.SendNotification("Creating new level");
             }
         }
