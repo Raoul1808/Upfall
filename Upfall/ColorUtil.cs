@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 
 namespace Upfall;
@@ -126,7 +127,17 @@ public static class ColorUtil
 
     public static string ColToHex(Color col)
     {
-        uint rgba = col.PackedValue;
+        uint rgba = (uint)((col.R << 24) + (col.G << 16) + (col.B << 8) + col.A);
         return rgba.ToString("x8");
+    }
+
+    public static bool IsValidRgbHex(string hex)
+    {
+        return Regex.IsMatch(hex, @"[0-9a-f]{6}\b");
+    }
+    
+    public static bool IsValidRgbaHex(string hex)
+    {
+        return Regex.IsMatch(hex, @"[0-9a-f]{8}\b");
     }
 }

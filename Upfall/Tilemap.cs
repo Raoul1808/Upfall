@@ -68,6 +68,11 @@ public class Tilemap
         _endPoint = pos;
     }
 
+    public void SetPalette(IPalette palette)
+    {
+        LevelPalette = palette;
+    }
+
     public Tile GetTileCommon(int x, int y) => _tiles[y, x];
 
     public Tile GetTileDark(int x, int y) => _darkTiles[y, x];
@@ -238,6 +243,11 @@ public class Tilemap
         }
 
         reader.Dispose();
+
+        if (palette is LerpPalette lerp)
+        {
+            Console.WriteLine("Lerp palette colors: " + lerp.DarkColor1 + " " + lerp.DarkColor2 + " " + lerp.LightColor1 + " " + lerp.LightColor2);
+        }
 
         return new Tilemap
         {

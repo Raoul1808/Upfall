@@ -13,6 +13,13 @@ namespace Upfall.Scenes;
 
 public class EditScene : Scene
 {
+    private enum MenuState
+    {
+        Main,
+        SimplePalette,
+        LerpPalette,
+    }
+    
     private Tilemap _tilemap;
     private Size _tilemapSize;
     private Point _currentTilePos;
@@ -21,28 +28,75 @@ public class EditScene : Scene
     public static string TilemapToLoad => _levelFilename;
 
     private MenuObject _editorMenu;
+    private MenuObject _simplePaletteMenu;
+    private MenuObject _lerpPaletteMenu;
+    private MenuState _currentMenu;
     private bool _showEditorMenu = false;
+
+    private PaletteType _currentPaletteType;
+    private string _simpleDarkCol;
+    private string _simpleLightCol;
+    private string _lerpDarkCol1;
+    private string _lerpDarkCol2;
+    private string _lerpLightCol1;
+    private string _lerpLightCol2;
 
     private TileType _currentTileId;
     private Direction _currentDirection;
+
+    private MenuObject GetCurrentMenu()
+    {
+        return _currentMenu switch
+        {
+            MenuState.Main => _editorMenu,
+            MenuState.SimplePalette => _simplePaletteMenu,
+            MenuState.LerpPalette => _lerpPaletteMenu,
+            _ => null,
+        };
+    }
     
     public override void Load()
     {
         ClearColor = Color.CornflowerBlue;
         PauseUpdate = true;
-        var menuSettings = new MenuSettings
+    }
+
+    private void OnConfigurePalettePressed(MenuButton sender)
+    {
+        switch (_currentPaletteType)
         {
-            FontSize = 32,
-        };
-        _editorMenu = MenuBuilder.CreateMenu(Assets.GetFontSystem("Open Sans"), new Vector2(200), menuSettings)
-            .AddButton("Resume", _ => _showEditorMenu = false)
-            .AddButton("More Options to come")
-            .AddButton("Exit to Menu", _ =>
-            {
-                SceneManager.Change("Menu");
-                _showEditorMenu = false;
-            })
-            .Build();
+            case PaletteType.Simple:
+                _currentMenu = MenuState.SimplePalette;
+                break;
+
+            case PaletteType.Lerp:
+                _currentMenu = MenuState.LerpPalette;
+                break;
+
+            case PaletteType.Trippy:
+                NotificationSystem.SendNotification("No configuration available for Trippy Palette");
+                break;
+        }
+    }
+
+    private void OnPaletteTypeChange(MenuArraySelect<PaletteType> sender, PaletteType selectedOption)
+    {
+        _currentPaletteType = selectedOption;
+        switch (selectedOption)
+        {
+            case PaletteType.Simple:
+                NotificationSystem.SendNotification("Remember to configure your simple palette!");
+                break;
+
+            case PaletteType.Lerp:
+                NotificationSystem.SendNotification("Remember to configure your lerp palette!");
+                break;
+
+            case PaletteType.Trippy:
+                NotificationSystem.SendNotification("Level Palette Selected: Trippy");
+                _tilemap.SetPalette(new TrippyPalette());
+                break;
+        }
     }
 
     private void CreateBlankTilemap()
@@ -55,12 +109,131 @@ public class EditScene : Scene
     {
         PaletteSystem.ResetPalette(0f);
         if (!UpfallCommon.Playtesting)
-            CreateBlankTilemap();
+            RefreshEditor();
         UpfallCommon.CurrentWorldMode = WorldMode.None;
         UpfallCommon.InEditor = true;
         UpfallCommon.Playtesting = false;
         _currentTileId = TileType.Solid;
         _currentDirection = Direction.Up;
+    }
+
+    private void RefreshEditor()
+    {
+        CreateBlankTilemap();
+        _simpleDarkCol = "000000";
+        _simpleLightCol = "ffffff";
+        _lerpDarkCol1 = "000000";
+        _lerpDarkCol2 = "000000";
+        _lerpLightCol1 = "ffffff";
+        _lerpLightCol2 = "ffffff";
+        
+        var menuSettings = new MenuSettings
+        {
+            FontSize = 32,
+        };
+        
+        var openSans = Assets.GetFontSystem("Open Sans");
+        
+        _editorMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
+            .AddButton("Resume", _ => _showEditorMenu = false)
+            .AddArraySelect("Level Palette Type", Enum.GetValues<PaletteType>(), 0, OnPaletteTypeChange)
+            .AddButton("Configure Palette", OnConfigurePalettePressed)
+            .AddButton("Exit to Menu", _ =>
+            {
+                SceneManager.Change("Menu");
+                _showEditorMenu = false;
+            })
+            .Build();
+
+        _simplePaletteMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
+            .AddTextInput("Dark Color Hex Code", "000000", (_, str) => _simpleDarkCol = str)
+            .AddTextInput("Light Color Hex Code", "ffffff", (_, str) => _simpleLightCol = str)
+            .AddButton("Apply Changes", _ => CreateSimplePalette())
+            .AddButton("Back", _ => _currentMenu = MenuState.Main)
+            .Build();
+
+        _lerpPaletteMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
+            .AddTextInput("Dark Color 1 Hex Code", "000000", (_, str) => _lerpDarkCol1 = str)
+            .AddTextInput("Dark Color 2 Hex Code", "000000", (_, str) => _lerpDarkCol2 = str)
+            .AddTextInput("Light Color 1 Hex Code", "ffffff", (_, str) => _lerpLightCol1 = str)
+            .AddTextInput("Light Color 2 Hex Code", "ffffff", (_, str) => _lerpLightCol2 = str)
+            .AddButton("Apply Changes", _ => CreateLerpPalette())
+            .AddButton("Back", _ => _currentMenu = MenuState.Main)
+            .Build();
+    }
+
+    private void CreateSimplePalette()
+    {
+        string darkHex = _simpleDarkCol.ToLower();
+        if (!ColorUtil.IsValidRgbHex(darkHex))
+        {
+            NotificationSystem.SendNotification("Invalid hex color for Dark Color");
+            return;
+        }
+
+        Color colA = ColorUtil.HexToCol(darkHex + "ff");
+
+        string lightHex = _simpleLightCol.ToLower();
+        if (!ColorUtil.IsValidRgbHex(lightHex))
+        {
+            NotificationSystem.SendNotification("Invalid hex color for Light Color");
+            return;
+        }
+
+        Color colB = ColorUtil.HexToCol(lightHex + "ff");
+
+        var palette = new SimplePalette
+        {
+            DarkColor = colA,
+            LightColor = colB,
+        };
+        _tilemap.SetPalette(palette);
+        NotificationSystem.SendNotification("Successfully applied simple palette");
+    }
+
+    private void CreateLerpPalette()
+    {
+        string darkHex1 = _lerpDarkCol1.ToLower();
+        if (!ColorUtil.IsValidRgbHex(darkHex1))
+        {
+            NotificationSystem.SendNotification("Invalid hex color for Dark Color 1");
+            return;
+        }
+        Color colA = ColorUtil.HexToCol(darkHex1 + "ff");
+        
+        string darkHex2 = _lerpDarkCol2.ToLower();
+        if (!ColorUtil.IsValidRgbHex(darkHex2))
+        {
+            NotificationSystem.SendNotification("Invalid hex color for Dark Color 2");
+            return;
+        }
+        Color colB = ColorUtil.HexToCol(darkHex2 + "ff");
+
+        string lightHex1 = _lerpLightCol1.ToLower();
+        if (!ColorUtil.IsValidRgbHex(lightHex1))
+        {
+            NotificationSystem.SendNotification("Invalid hex color for Light Color 1");
+            return;
+        }
+        Color colC = ColorUtil.HexToCol(lightHex1 + "ff");
+
+        string lightHex2 = _lerpLightCol2.ToLower();
+        if (!ColorUtil.IsValidRgbHex(lightHex2))
+        {
+            NotificationSystem.SendNotification("Invalid hex color for Light Color 2");
+            return;
+        }
+        Color colD = ColorUtil.HexToCol(lightHex2 + "ff");
+
+        var palette = new LerpPalette()
+        {
+            DarkColor1 = colA,
+            DarkColor2 = colB,
+            LightColor1 = colC,
+            LightColor2 = colD,
+        };
+        _tilemap.SetPalette(palette);
+        NotificationSystem.SendNotification("Successfully applied lerp palette");
     }
 
     public override void OnBecomeInactive()
@@ -109,7 +282,7 @@ public class EditScene : Scene
         
         if (_showEditorMenu)
         {
-            _editorMenu.Update();
+            GetCurrentMenu()?.Update();
             return;
         }
 
@@ -288,6 +461,6 @@ public class EditScene : Scene
     public override void ScreenRender(SpriteBatch spriteBatch)
     {
         if (_showEditorMenu)
-            _editorMenu.Render(spriteBatch);
+            GetCurrentMenu()?.Render(spriteBatch);
     }
 }
