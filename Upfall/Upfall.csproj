@@ -1,7 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' != 'Release'">
         <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <OutputType>WinExe</OutputType>
+    </PropertyGroup>
+    
+    <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ApplicationIcon>upfall.ico</ApplicationIcon>
     </PropertyGroup>
