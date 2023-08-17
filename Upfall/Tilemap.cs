@@ -20,6 +20,8 @@ public class Tilemap
     private Point _endPoint;
 
     private int _keyCount;
+    
+    public string LevelName { get; private set; }
 
     public Vector2 HalfTile => new(TileSize / 2f);
 

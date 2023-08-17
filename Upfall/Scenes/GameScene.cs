@@ -12,9 +12,6 @@ internal class GameScene : Scene
     private Player _player;
     private Tilemap _tilemap;
 
-    private Color color1 = Color.Blue;
-    private Color color2 = Color.Yellow;
-
     private bool _waitForEndParticles = false;
     
     public override void Load()
@@ -31,6 +28,17 @@ internal class GameScene : Scene
 
     public override void OnBecomeActive()
     {
+        var palette = new LerpPalette()
+        {
+            DarkColor1 = Color.DarkRed,
+            DarkColor2 = Color.Red,
+            LightColor1 = Color.OrangeRed,
+            LightColor2 = Color.DarkOrange,
+        };
+        // var palette = new TrippyPalette();
+
+        PaletteSystem.SetPalette(palette);
+        
         _waitForEndParticles = false;
         UpfallCommon.OnWorldChange += SetCircleAnim;
         _tilemap = Tilemap.LoadFromFile(UpfallCommon.Playtesting ? EditScene.TilemapToLoad : "map.umd");
@@ -119,12 +127,6 @@ internal class GameScene : Scene
         
         if (!_player.IsDead)
             _tilemap.SolveCollisions(_player);
-
-        ColorUtil.IncreaseHueBy(ref color1, 1, out _);
-        ColorUtil.IncreaseHueBy(ref color2, 1, out _);
-
-        ShaderEffectSystem.SetDarkColor(color1);
-        ShaderEffectSystem.SetLightColor(color2);
         
         ShaderEffectSystem.SetCircleCanvasPos(_player.Position);
     }

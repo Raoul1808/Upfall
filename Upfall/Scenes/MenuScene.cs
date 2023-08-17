@@ -19,6 +19,8 @@ public class MenuScene : Scene
     
     public override void Load()
     {
+        ScreenEffect = Assets.GetEffect("DynamicOneBit");
+        
         var menuSettings = new MenuSettings
         {
             FontSize = 64f,
@@ -46,6 +48,8 @@ public class MenuScene : Scene
         UpfallCommon.InEditor = false;
         UpfallCommon.Playtesting = false;
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
+        PaletteSystem.ResetPalette();
+        ShaderEffectSystem.SetCircleRadius(0f);
     }
 
     public override void Update(float dt)

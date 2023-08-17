@@ -18,15 +18,10 @@ public class ShaderEffectSystem : BroccoAutoSystem
 
     public const float CircleTransitionTime = 0.5f;
     
-    public override void Initialize(BroccoGame game)
+    public override void PostInitialize(BroccoGame game)
     {
         _shader = Assets.GetEffect("DynamicOneBit");
         _shader.Parameters["CirclePos"].SetValue(Vector2.One * 200f);
-    }
-
-    private double EaseOutQuart(double x)
-    {
-        return 1.0 - Math.Pow(1 - x, 4);
     }
 
     public override void PostUpdate(GameTime gameTime)
@@ -38,7 +33,7 @@ public class ShaderEffectSystem : BroccoAutoSystem
         if (Math.Abs(_currentCircleSize - _targetCircleSize) > 0.0001f)
         {
             _circleTimer += dt;
-            _currentCircleSize = MathHelper.Lerp(_startCircleSize, _targetCircleSize, (float)EaseOutQuart(_circleTimer / CircleTransitionTime));
+            _currentCircleSize = MathHelper.Lerp(_startCircleSize, _targetCircleSize, (float)Easings.OutQuart(_circleTimer / CircleTransitionTime));
         }
         _circleWobbleSize = (float)Math.Sin(tt) * wobbleAmount - wobbleAmount;
         SetCircleRadius(_currentCircleSize + _circleWobbleSize);

@@ -25,6 +25,7 @@ internal class Program
         
         game.AddSystem<NotificationSystem>();
         game.AddSystem<ShaderEffectSystem>();
+        game.AddSystem<PaletteSystem>();
 
         SceneManager.Add("Menu", new MenuScene());
         SceneManager.Add("Game", new GameScene());

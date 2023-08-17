@@ -12,7 +12,7 @@ public class NotificationSystem : BroccoAutoSystem
     private static string _currentNotification = "";
     private static float _notificationTimer = 0f;
 
-    public override void Initialize(BroccoGame game)
+    public override void PostInitialize(BroccoGame game)
     {
         _font = Assets.GetFontSystem("Open Sans");
     }
