@@ -4,6 +4,7 @@ using Brocco;
 using Brocco.Basic;
 using Brocco.Input;
 using Brocco.Menu;
+using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -130,6 +131,8 @@ public class EditScene : Scene
         var menuSettings = new MenuSettings
         {
             FontSize = 32,
+            FontEffect = FontSystemEffect.Stroked,
+            FontEffectStrength = 1,
         };
         
         var openSans = Assets.GetFontSystem("Open Sans");
