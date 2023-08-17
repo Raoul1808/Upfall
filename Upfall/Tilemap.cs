@@ -124,6 +124,11 @@ public class Tilemap
             mode = WorldMode.None;
 
         _keyCount--;
+        AudioManager.PlayWorldSound("pickup");
+
+        if (_keyCount <= 0)
+            AudioManager.PlayWorldSound("unlock");
+        
         switch (mode)
         {
             case WorldMode.None:

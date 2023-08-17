@@ -86,6 +86,7 @@ public class Player : TilemapEntity
             Velocity.Y = -JumpForce * (int)_fallDirection;
             _isJumping = true;
             _canJump = false;
+            AudioManager.PlayWorldSound("jump");
         }
 
         if (Velocity.Y == 0f || Math.Sign(Velocity.Y) == Math.Sign((int)_fallDirection))
@@ -146,6 +147,7 @@ public class Player : TilemapEntity
     {
         // 🦀 The player is dead 🦀
         IsDead = true;
+        AudioManager.PlayWorldSound("death");
         ParticleSystem.SpawnDeathParticles(Position);
         Dispose();
     }
@@ -154,6 +156,7 @@ public class Player : TilemapEntity
     {
         // Win code
         WonLevel = true;
+        AudioManager.PlayWorldSound("leveldone");
         Velocity = Vector2.Zero;
     }
 }
