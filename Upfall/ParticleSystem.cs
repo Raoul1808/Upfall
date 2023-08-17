@@ -56,12 +56,13 @@ public static class ParticleSystem
 
     public static void SpawnDeathParticles(Vector2 pos)
     {
-        const float deathParticleMin = 0.25f;
-        const float deathParticleMax = 0.55f;
-        const float particleVelocity = 30f;
-        const float particleScale = 2f;
+        const float deathParticleMin = 0.10f;
+        const float deathParticleMax = 0.15f;
+        const float deathTime = 0.55f;
+        const float particleVelocity = 180f;
+        const float particleScale = 3f;
 
-        _deathParticleTimer = deathParticleMax;
+        _deathParticleTimer = deathTime;
         
         var amount = _random.Next(10, 14);
         for (int i = 0; i < amount; i++)
