@@ -59,22 +59,24 @@ public static class ParticleSystem
         const float deathParticleMin = 0.10f;
         const float deathParticleMax = 0.15f;
         const float deathTime = 0.55f;
-        const float particleVelocity = 180f;
+        const float particleVelocity = 120f;
         const float particleScale = 3f;
+        const int xOffset = 2;
+        const int yOffset = 2;
 
         _deathParticleTimer = deathTime;
         
         var amount = _random.Next(10, 14);
         for (int i = 0; i < amount; i++)
         {
-            int xOffset = _random.Next(-1, 2);
-            int yOffset = _random.Next(-1, 2);
+            int x = _random.Next(-xOffset, xOffset + 1);
+            int y = _random.Next(-yOffset, yOffset + 1);
             float angle = _random.NextSingle() * MathHelper.TwoPi;
             var vel = Vector2.Transform(Vector2.UnitX * particleVelocity, Matrix.CreateRotationZ(angle));
             float ttl = GetRandomBetweenFloats(deathParticleMin, deathParticleMax);
             _particles.Add(new()
             {
-                Position = new Vector2(pos.X + xOffset, pos.Y + yOffset),
+                Position = new Vector2(pos.X + x, pos.Y + y),
                 Velocity = vel,
                 Scale = particleScale,
                 TimeToLive = ttl,
