@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using Microsoft.Xna.Framework;
 
 namespace Upfall;
 
@@ -37,4 +38,6 @@ public static class UpfallCommon
     public static readonly string GamePath = Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? "";
 
     public static readonly string TilesPath = Path.Join(GamePath, "Content", "Maps");
+
+    public static Vector2 ScreenCenter;
 }

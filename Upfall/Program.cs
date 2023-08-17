@@ -17,8 +17,11 @@ internal class Program
             ShowMouse = true,
         };
         using var game = new BroccoGame(gameSettings);
+
+        UpfallCommon.ScreenCenter = gameSettings.Resolution?.ToVector2() / 2f ?? new Vector2();  // wtf
         
         Assets.PreloadFont("Open Sans", new []{"OpenSans.ttf"});
+        Assets.PreloadFont("Tiny Unicode", new[]{"TinyUnicode.ttf"});
         
         game.AddSystem<NotificationSystem>();
         game.AddSystem<ShaderEffectSystem>();
