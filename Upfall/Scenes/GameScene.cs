@@ -28,19 +28,10 @@ internal class GameScene : Scene
 
     public override void OnBecomeActive()
     {
-        var palette = new LerpPalette()
-        {
-            DarkColor1 = Color.DarkRed,
-            DarkColor2 = Color.Red,
-            LightColor1 = Color.OrangeRed,
-            LightColor2 = Color.DarkOrange,
-        };
-
-        PaletteSystem.SetPalette(palette, UpfallCommon.Playtesting ? 0f : 1f);
-        
         _waitForEndParticles = false;
         UpfallCommon.OnWorldChange += SetCircleAnim;
         _tilemap = Tilemap.LoadFromFile(UpfallCommon.Playtesting ? EditScene.TilemapToLoad : "map.umd");
+        PaletteSystem.SetPalette(_tilemap.LevelPalette, UpfallCommon.Playtesting ? 0f : 1f);
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
         _player = AddToScene<Player>();
         _player.Position = _tilemap.GetSpawnPos();
