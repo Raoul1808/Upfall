@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 
 namespace Upfall;
@@ -113,5 +114,19 @@ public static class ColorUtil
                 b = q;
                 break;
         }
+    }
+    
+    
+    public static Color HexToCol(string hex)
+    {
+        uint rgba = uint.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+        var bytes = BitConverter.GetBytes(rgba);
+        return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
+    }
+
+    public static string ColToHex(Color col)
+    {
+        uint rgba = col.PackedValue;
+        return rgba.ToString("x8");
     }
 }

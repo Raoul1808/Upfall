@@ -253,19 +253,6 @@ public class Tilemap
         };
     }
 
-    private static Color HexToCol(string hex)
-    {
-        uint rgba = uint.Parse(hex, System.Globalization.NumberStyles.HexNumber);
-        var bytes = BitConverter.GetBytes(rgba);
-        return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
-    }
-
-    private string ColToHex(Color col)
-    {
-        uint rgba = col.PackedValue;
-        return rgba.ToString("x8");
-    }
-
     private static IPalette LoadPalette(StreamReader reader)
     {
         string line = reader.ReadLine();
@@ -277,8 +264,8 @@ public class Tilemap
                 string light = reader.ReadLine();
                 return new SimplePalette
                 {
-                    DarkColor = HexToCol(dark),
-                    LightColor = HexToCol(light),
+                    DarkColor = ColorUtil.HexToCol(dark),
+                    LightColor = ColorUtil.HexToCol(light),
                 };
             case 1:  // Lerp palette
                 string dark1 = reader.ReadLine();
@@ -287,10 +274,10 @@ public class Tilemap
                 string light2 = reader.ReadLine();
                 return new LerpPalette()
                 {
-                    DarkColor1 = HexToCol(dark1),
-                    DarkColor2 = HexToCol(dark2),
-                    LightColor1 = HexToCol(light1),
-                    LightColor2 = HexToCol(light2),
+                    DarkColor1 = ColorUtil.HexToCol(dark1),
+                    DarkColor2 = ColorUtil.HexToCol(dark2),
+                    LightColor1 = ColorUtil.HexToCol(light1),
+                    LightColor2 = ColorUtil.HexToCol(light2),
                 };
             case 2:  // Trippy palette
                 return new TrippyPalette();
@@ -305,18 +292,18 @@ public class Tilemap
         if (LevelPalette is SimplePalette simple)
         {
             writer.WriteLine((char)0);  // Palette Type: Simple
-            writer.WriteLine(ColToHex(simple.DarkColor));
-            writer.WriteLine(ColToHex(simple.LightColor));
+            writer.WriteLine(ColorUtil.ColToHex(simple.DarkColor));
+            writer.WriteLine(ColorUtil.ColToHex(simple.LightColor));
             return;
         }
 
         if (LevelPalette is LerpPalette lerp)
         {
             writer.WriteLine((char)1);  // Palette Type: Lerp
-            writer.WriteLine(ColToHex(lerp.DarkColor1));
-            writer.WriteLine(ColToHex(lerp.DarkColor2));
-            writer.WriteLine(ColToHex(lerp.LightColor1));
-            writer.WriteLine(ColToHex(lerp.LightColor2));
+            writer.WriteLine(ColorUtil.ColToHex(lerp.DarkColor1));
+            writer.WriteLine(ColorUtil.ColToHex(lerp.DarkColor2));
+            writer.WriteLine(ColorUtil.ColToHex(lerp.LightColor1));
+            writer.WriteLine(ColorUtil.ColToHex(lerp.LightColor2));
             return;
         }
 
