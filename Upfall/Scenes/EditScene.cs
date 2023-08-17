@@ -16,7 +16,9 @@ public class EditScene : Scene
     private Tilemap _tilemap;
     private Size _tilemapSize;
     private Point _currentTilePos;
-    private string _levelFilename = string.Empty;
+    private static string _levelFilename = string.Empty;
+
+    public static string TilemapToLoad => _levelFilename;
 
     private MenuObject _editorMenu;
     private bool _showEditorMenu = false;
@@ -66,6 +68,38 @@ public class EditScene : Scene
         UpfallCommon.Playtesting = true;
     }
 
+    private void SaveToNewLocation()
+    {
+        DialogResult res = Dialog.FileSave("umd", UpfallCommon.GamePath);
+        if (res.IsOk)
+        {
+            _levelFilename = res.Path;
+            SaveLevel();
+        }
+    }
+
+    private bool SaveLevel()
+    {
+        if (_levelFilename == string.Empty)
+        {
+            NotificationSystem.SendNotification("Cannot save: path not set");
+            return false;
+        }
+
+        _tilemap.SaveToFile(_levelFilename);
+        NotificationSystem.SendNotification("Saved Level to " + _levelFilename);
+        return true;
+    }
+
+    private void OpenLevel()
+    {
+        DialogResult res = Dialog.FileOpen("umd", UpfallCommon.GamePath);
+        if (res.IsOk)
+        {
+            _levelFilename = res.Path;
+        }
+    }
+
     public override void Update(float dt)
     {
         if (InputManager.GetKeyPress(Keys.Escape))
@@ -107,20 +141,10 @@ public class EditScene : Scene
         {
             if (InputManager.GetKeyPress(Keys.S))
             {
-                DialogResult res;
-                if ((_levelFilename == string.Empty || InputManager.GetKeyDown(Keys.LeftShift)) &&
-                    (res = Dialog.FileSave("umd", UpfallCommon.GamePath)).IsOk)
-                {
-                    _levelFilename = res.Path;
-                }
-
-                if (_levelFilename == string.Empty)
-                    NotificationSystem.SendNotification("Cannot save: path not set");
+                if (_levelFilename == string.Empty || InputManager.GetKeyDown(Keys.LeftShift))
+                    SaveToNewLocation();
                 else
-                {
-                    _tilemap.SaveToFile(_levelFilename);
-                    NotificationSystem.SendNotification("Saved Level to " + _levelFilename);
-                }
+                    SaveLevel();
             }
 
             if (InputManager.GetKeyPress(Keys.O))
@@ -145,9 +169,8 @@ public class EditScene : Scene
                 }
             }
 
-            if (InputManager.GetKeyPress(Keys.T))
+            if (InputManager.GetKeyPress(Keys.T) && SaveLevel())
             {
-                _tilemap.SaveToFile("map.umd");
                 SceneManager.Change("Game");
                 NotificationSystem.SendNotification("Now playing level " + _levelFilename);
                 return;  // Don't execute further

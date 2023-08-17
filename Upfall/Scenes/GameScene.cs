@@ -33,7 +33,7 @@ internal class GameScene : Scene
     {
         _waitForEndParticles = false;
         UpfallCommon.OnWorldChange += SetCircleAnim;
-        _tilemap = Tilemap.LoadFromFile("map.umd");
+        _tilemap = Tilemap.LoadFromFile(UpfallCommon.Playtesting ? EditScene.TilemapToLoad : "map.umd");
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
         _player = AddToScene<Player>();
         _player.Position = _tilemap.GetSpawnPos();
