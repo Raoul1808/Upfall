@@ -35,9 +35,8 @@ internal class GameScene : Scene
             LightColor1 = Color.OrangeRed,
             LightColor2 = Color.DarkOrange,
         };
-        // var palette = new TrippyPalette();
 
-        PaletteSystem.SetPalette(palette);
+        PaletteSystem.SetPalette(palette, UpfallCommon.Playtesting ? 0f : 1f);
         
         _waitForEndParticles = false;
         UpfallCommon.OnWorldChange += SetCircleAnim;

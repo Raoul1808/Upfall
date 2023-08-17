@@ -36,7 +36,7 @@ public class EditScene : Scene
         };
         _editorMenu = MenuBuilder.CreateMenu(Assets.GetFontSystem("Open Sans"), new Vector2(200), menuSettings)
             .AddButton("Resume", _ => _showEditorMenu = false)
-            .AddTextInput("Level Name")
+            .AddButton("More Options to come")
             .AddButton("Exit to Menu", _ =>
             {
                 SceneManager.Change("Menu");
@@ -53,6 +53,7 @@ public class EditScene : Scene
 
     public override void OnBecomeActive()
     {
+        PaletteSystem.ResetPalette(0f);
         if (!UpfallCommon.Playtesting)
             CreateBlankTilemap();
         UpfallCommon.CurrentWorldMode = WorldMode.None;
@@ -65,7 +66,8 @@ public class EditScene : Scene
     public override void OnBecomeInactive()
     {
         UpfallCommon.InEditor = false;
-        UpfallCommon.Playtesting = true;
+        if (UpfallCommon.Playtesting)
+            PaletteSystem.SetPalette(_tilemap.LevelPalette);
     }
 
     private void SaveToNewLocation()
@@ -172,6 +174,7 @@ public class EditScene : Scene
             if (InputManager.GetKeyPress(Keys.T) && SaveLevel())
             {
                 SceneManager.Change("Game");
+                UpfallCommon.Playtesting = true;
                 NotificationSystem.SendNotification("Now playing level " + _levelFilename);
                 return;  // Don't execute further
             }

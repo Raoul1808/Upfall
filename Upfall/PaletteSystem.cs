@@ -153,11 +153,7 @@ public class PaletteSystem : BroccoAutoSystem
 
     public override void PreInitialize(BroccoGame game)
     {
-        _currentPalette = new SimplePalette
-        {
-            DarkColor = Color.Black,
-            LightColor = Color.White,
-        };
+        _currentPalette = GetDefaultPalette();
         _paletteTimer = 0f;
         _lastDarkColor = Color.Black;
         _lastLightColor = Color.White;
@@ -193,12 +189,10 @@ public class PaletteSystem : BroccoAutoSystem
         _currentPalette = palette;
     }
 
-    public static void ResetPalette()
+    public static void ResetPalette(float time = 1f)
     {
-        SetPalette(new SimplePalette
-        {
-            DarkColor = Color.Black,
-            LightColor = Color.White,
-        });
+        SetPalette(GetDefaultPalette(), time);
     }
+
+    public static IPalette GetDefaultPalette() => new SimplePalette { DarkColor = Color.Black, LightColor = Color.White };
 }

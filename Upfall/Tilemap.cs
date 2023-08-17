@@ -22,6 +22,7 @@ public class Tilemap
     private int _keyCount;
     
     public string LevelName { get; private set; }
+    public IPalette LevelPalette { get; private set; }
 
     public Vector2 HalfTile => new(TileSize / 2f);
 
@@ -36,6 +37,7 @@ public class Tilemap
         _darkTiles = new Tile[size.Height, size.Width];
         _lightTiles = new Tile[size.Height, size.Width];
         _keyCount = 0;
+        LevelPalette = PaletteSystem.GetDefaultPalette();
     }
 
     public void SetCommonTile(Point pos, TileType tile, Direction direction)
@@ -177,12 +179,14 @@ public class Tilemap
     public static Tilemap LoadFromFile(string path)
     {
         var reader = File.OpenText(path);
-        var width = int.Parse(reader.ReadLine() ?? "0");
-        var height = int.Parse(reader.ReadLine() ?? "0");
-        var startX = int.Parse(reader.ReadLine() ?? "0");
-        var startY = int.Parse(reader.ReadLine() ?? "0");
-        var endX = int.Parse(reader.ReadLine() ?? "0");
-        var endY = int.Parse(reader.ReadLine() ?? "0");
+        string levelName = reader.ReadLine();
+        var palette = LoadPalette(reader);
+        int width = int.Parse(reader.ReadLine() ?? "0");
+        int height = int.Parse(reader.ReadLine() ?? "0");
+        int startX = int.Parse(reader.ReadLine() ?? "0");
+        int startY = int.Parse(reader.ReadLine() ?? "0");
+        int endX = int.Parse(reader.ReadLine() ?? "0");
+        int endY = int.Parse(reader.ReadLine() ?? "0");
         var size = new Size(width, height);
         var tiles = new Tile[height, width];
         var darkTiles = new Tile[height, width];
@@ -239,12 +243,90 @@ public class Tilemap
             _spawnPoint = new(startX, startY),
             _endPoint = new(endX, endY),
             _keyCount = keyCount,
+            LevelName = levelName,
+            LevelPalette = palette,
         };
+    }
+
+    private static Color HexToCol(string hex)
+    {
+        uint rgba = uint.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+        var bytes = BitConverter.GetBytes(rgba);
+        return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
+    }
+
+    private string ColToHex(Color col)
+    {
+        uint rgba = col.PackedValue;
+        return rgba.ToString("x8");
+    }
+
+    private static IPalette LoadPalette(StreamReader reader)
+    {
+        string line = reader.ReadLine();
+        int palette = line?[0] ?? -1;
+        switch (palette)
+        {
+            case 0:  // Simple palette
+                string dark = reader.ReadLine();
+                string light = reader.ReadLine();
+                return new SimplePalette
+                {
+                    DarkColor = HexToCol(dark),
+                    LightColor = HexToCol(light),
+                };
+            case 1:  // Lerp palette
+                string dark1 = reader.ReadLine();
+                string dark2 = reader.ReadLine();
+                string light1 = reader.ReadLine();
+                string light2 = reader.ReadLine();
+                return new LerpPalette()
+                {
+                    DarkColor1 = HexToCol(dark1),
+                    DarkColor2 = HexToCol(dark2),
+                    LightColor1 = HexToCol(light1),
+                    LightColor2 = HexToCol(light2),
+                };
+            case 2:  // Trippy palette
+                return new TrippyPalette();
+            
+            default:
+                return PaletteSystem.GetDefaultPalette();
+        }
+    }
+
+    private void SavePalette(StreamWriter writer)
+    {
+        if (LevelPalette is SimplePalette simple)
+        {
+            writer.WriteLine((char)0);  // Palette Type: Simple
+            writer.WriteLine(ColToHex(simple.DarkColor));
+            writer.WriteLine(ColToHex(simple.LightColor));
+            return;
+        }
+
+        if (LevelPalette is LerpPalette lerp)
+        {
+            writer.WriteLine((char)1);  // Palette Type: Lerp
+            writer.WriteLine(ColToHex(lerp.DarkColor1));
+            writer.WriteLine(ColToHex(lerp.DarkColor2));
+            writer.WriteLine(ColToHex(lerp.LightColor1));
+            writer.WriteLine(ColToHex(lerp.LightColor2));
+            return;
+        }
+
+        if (LevelPalette is TrippyPalette)
+        {
+            writer.WriteLine((char)2);  // Palette Type : Trippy
+            return;
+        }
     }
     
     public void SaveToFile(string path)
     {
         var writer = File.CreateText(path);
+        writer.WriteLine(LevelName);
+        SavePalette(writer);
         writer.WriteLine(_tilemapSize.Width);
         writer.WriteLine(_tilemapSize.Height);
         writer.WriteLine(_spawnPoint.X);
