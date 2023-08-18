@@ -126,7 +126,7 @@ public class Tilemap
             }
         }
         else
-            mode = WorldMode.None;
+            mode = WorldMode.Common;
 
         _keyCount--;
         AudioManager.PlayWorldSound("pickup");
@@ -136,7 +136,7 @@ public class Tilemap
         
         switch (mode)
         {
-            case WorldMode.None:
+            case WorldMode.Common:
                 SetCommonTile(new(x, y), TileType.None, Direction.Left);
                 break;
 
@@ -522,7 +522,7 @@ public class Tilemap
 
     public void Render(SpriteBatch spriteBatch)
     {
-        RenderLayer(spriteBatch, WorldMode.None, Color.Fuchsia);
+        RenderLayer(spriteBatch, WorldMode.Common, Color.Fuchsia);
         RenderLayer(spriteBatch, WorldMode.Dark, Color.Red);
         RenderLayer(spriteBatch, WorldMode.Light, Color.Blue);
         RenderTile(spriteBatch, Color.White, _endPoint, TileType.ExitDoor);

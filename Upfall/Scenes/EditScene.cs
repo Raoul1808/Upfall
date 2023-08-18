@@ -111,7 +111,7 @@ public class EditScene : Scene
         PaletteSystem.ResetPalette(0f);
         if (!UpfallCommon.Playtesting)
             RefreshEditor();
-        UpfallCommon.CurrentWorldMode = WorldMode.None;
+        UpfallCommon.CurrentWorldMode = WorldMode.Common;
         UpfallCommon.InEditor = true;
         UpfallCommon.Playtesting = false;
         _currentTileId = TileType.Solid;
@@ -441,7 +441,7 @@ public class EditScene : Scene
         
         switch (UpfallCommon.CurrentWorldMode)
         {
-            case WorldMode.None:
+            case WorldMode.Common:
                 _tilemap.SetCommonTile(pos, tile, direction);
                 break;
 
