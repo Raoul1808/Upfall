@@ -6,6 +6,14 @@ namespace Upfall;
 
 public static class UpfallCommon
 {
+    #if DEBUG
+    public const string Version = "1.0.0-DEBUG";
+    public const string ShortVersion = "1.0-DEBUG";
+    #else
+    public const string Version = "1.0.0";
+    public const string ShortVersion = "1.0";
+    #endif
+    
     private static WorldMode _currentWorldMode;
 
     public delegate void WorldChangeEvent(WorldMode oldMode, WorldMode newMode);

@@ -17,6 +17,7 @@ internal class Program
             ShowMouse = true,
         };
         using var game = new BroccoGame(gameSettings);
+        game.Window.Title = "Upfall v" + UpfallCommon.ShortVersion;
 
         UpfallCommon.ScreenCenter = gameSettings.Resolution?.ToVector2() / 2f ?? new Vector2();  // wtf
 

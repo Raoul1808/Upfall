@@ -1,5 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <Version>1.0.0</Version>
+        <ShortVersion>1.0</ShortVersion>
+    </PropertyGroup>
+    
     <PropertyGroup Condition="'$(Configuration)' != 'Release'">
         <OutputType>Exe</OutputType>
     </PropertyGroup>
@@ -34,8 +39,8 @@
         <CFBundleName>Upfall</CFBundleName>
         <CFBundleDisplayName>Upfall</CFBundleDisplayName>
         <CFBundleIdentifier>io.raoul1808.upfall</CFBundleIdentifier>
-        <CFBundleVersion>1.0.0</CFBundleVersion>
-        <CFBundleShortVersionString>1.0</CFBundleShortVersionString>
+        <CFBundleVersion>$(Version)</CFBundleVersion>
+        <CFBundleShortVersionString>$(ShortVersion)</CFBundleShortVersionString>
         <CFBundlePackageType>APPL</CFBundlePackageType>
         <CFBundleSignature>????</CFBundleSignature>
         <CFBundleExecutable>Upfall</CFBundleExecutable>
