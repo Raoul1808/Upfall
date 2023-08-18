@@ -21,8 +21,9 @@ public class Tilemap
 
     private int _keyCount;
     
-    public string LevelName { get; private set; }
-    public IPalette LevelPalette { get; private set; }
+    public string LevelName { get; set; }
+    public string LevelAuthor { get; set; }
+    public IPalette LevelPalette { get; set; }
 
     public Vector2 HalfTile => new(TileSize / 2f);
 
@@ -66,11 +67,6 @@ public class Tilemap
     public void SetExit(Point pos)
     {
         _endPoint = pos;
-    }
-
-    public void SetPalette(IPalette palette)
-    {
-        LevelPalette = palette;
     }
 
     public Tile GetTileCommon(int x, int y) => _tiles[y, x];
@@ -190,6 +186,7 @@ public class Tilemap
     {
         var reader = File.OpenText(path);
         string levelName = reader.ReadLine();
+        string levelAuthor = reader.ReadLine();
         var palette = LoadPalette(reader);
         int width = int.Parse(reader.ReadLine() ?? "0");
         int height = int.Parse(reader.ReadLine() ?? "0");
@@ -259,6 +256,7 @@ public class Tilemap
             _endPoint = new(endX, endY),
             _keyCount = keyCount,
             LevelName = levelName,
+            LevelAuthor = levelAuthor,
             LevelPalette = palette,
         };
     }
@@ -327,6 +325,7 @@ public class Tilemap
     {
         var writer = File.CreateText(path);
         writer.WriteLine(LevelName);
+        writer.WriteLine(LevelAuthor);
         SavePalette(writer);
         writer.WriteLine(_tilemapSize.Width);
         writer.WriteLine(_tilemapSize.Height);

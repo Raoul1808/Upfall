@@ -95,7 +95,7 @@ public class EditScene : Scene
 
             case PaletteType.Trippy:
                 NotificationSystem.SendNotification("Level Palette Selected: Trippy");
-                _tilemap.SetPalette(new TrippyPalette());
+                _tilemap.LevelPalette = new TrippyPalette();
                 break;
         }
     }
@@ -139,12 +139,14 @@ public class EditScene : Scene
         
         _editorMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
             .AddButton("Resume", _ => _showEditorMenu = false)
+            .AddTextInput("Level Name", "", (_, name) => _tilemap.LevelName = name)
+            .AddTextInput("Level Author", "", (_, name) => _tilemap.LevelAuthor = name)
             .AddArraySelect("Level Palette Type", Enum.GetValues<PaletteType>(), 0, OnPaletteTypeChange)
             .AddButton("Configure Palette", OnConfigurePalettePressed)
             .AddButton("Exit to Menu", _ =>
             {
-                SceneManager.Change("Menu");
                 _showEditorMenu = false;
+                SceneManager.Change("Menu");
             })
             .Build();
 
@@ -190,7 +192,7 @@ public class EditScene : Scene
             DarkColor = colA,
             LightColor = colB,
         };
-        _tilemap.SetPalette(palette);
+        _tilemap.LevelPalette = palette;
         NotificationSystem.SendNotification("Successfully applied simple palette");
     }
 
@@ -235,7 +237,7 @@ public class EditScene : Scene
             LightColor1 = colC,
             LightColor2 = colD,
         };
-        _tilemap.SetPalette(palette);
+        _tilemap.LevelPalette = palette;
         NotificationSystem.SendNotification("Successfully applied lerp palette");
     }
 
