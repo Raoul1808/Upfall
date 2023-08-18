@@ -68,6 +68,7 @@ public class MenuScene : Scene
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
         PaletteSystem.ResetPalette();
         ShaderEffectSystem.SetCircleRadius(0f);
+        UpfallCommon.ResetPreviousLevelTextDisplayed();
     }
 
     private MenuObject GetCurrentMenu()

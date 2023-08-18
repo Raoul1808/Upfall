@@ -56,6 +56,7 @@ public static class UpfallCommon
     
     private static List<string> _currentLevelSet;
     private static int _currentLevel;
+    private static string _previousLevelTextDisplayed = string.Empty;
 
     public static void SetLevelSet(List<string> levelset, int startingLevel = 0)
     {
@@ -75,8 +76,15 @@ public static class UpfallCommon
     public static Tilemap LoadLevel(int level)
     {
         level = Math.Clamp(level, 0, _currentLevelSet.Count - 1);
-        var tilemap = Tilemap.LoadFromFile(_currentLevelSet[level]);
-        NotificationSystem.ShowLevelName(tilemap.LevelName, tilemap.LevelAuthor);
+        string levelPath = _currentLevelSet[level];
+        var tilemap = Tilemap.LoadFromFile(levelPath);
+        if (_previousLevelTextDisplayed != levelPath)
+        {
+            _previousLevelTextDisplayed = levelPath;
+            NotificationSystem.ShowLevelName(tilemap.LevelName, tilemap.LevelAuthor);
+        }
         return tilemap;
     }
+
+    public static void ResetPreviousLevelTextDisplayed() => _previousLevelTextDisplayed = string.Empty;
 }
