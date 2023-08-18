@@ -41,8 +41,8 @@ public class MenuScene : Scene
             .Build();
 
         _optionsMenu = MenuBuilder.CreateMenu(_tinyUnicodeFont, UpfallCommon.ScreenCenter, menuSettings)
-            .AddToggle("Display Custom Palettes", true)
-            .AddArraySelect("Sound Volume", Enumerable.Range(0, 11).ToArray(), 10)
+            .AddToggle("Display Custom Palettes", true, (_, enable) => PaletteSystem.DisplayCustomPalettes = enable)
+            .AddArraySelect("Sound Volume", Enumerable.Range(0, 11).ToArray(), 10, (_, volume) => AudioManager.Volume = volume)
             .AddButton("Back", _ => _currentMenu = MenuState.MainMenu)
             .Build();
     }

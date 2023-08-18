@@ -165,6 +165,18 @@ public class PaletteSystem : BroccoAutoSystem
     private static IPalette _currentPalette;
     private static float _paletteTimer = 0f;
 
+    private static bool _allowPaletteChanges = true;
+
+    public static bool DisplayCustomPalettes
+    {
+        get => _allowPaletteChanges;
+        set
+        {
+            ResetPalette(0f);
+            _allowPaletteChanges = value;
+        }
+    }
+
     public override void PreInitialize(BroccoGame game)
     {
         _currentPalette = GetDefaultPalette();
@@ -196,6 +208,7 @@ public class PaletteSystem : BroccoAutoSystem
 
     public static void SetPalette(IPalette palette, float time = 1f)
     {
+        if (!_allowPaletteChanges) return;
         if (_currentPalette.Equals(palette)) return;  // We don't want to re-set the palette
         _paletteTimer = time;
         _lastDarkColor = _currentPalette.DarkColor;
