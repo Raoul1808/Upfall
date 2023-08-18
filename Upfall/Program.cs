@@ -23,8 +23,7 @@ internal class Program
     }
 
     private const string SettingsFile = "Settings.json";
-    private static readonly string GamePath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
-    private static readonly string ConfigLocation = Path.Join(GamePath, SettingsFile);
+    private static readonly string ConfigLocation = Path.Join(UpfallCommon.GamePath, SettingsFile);
     
     public static void Main()
     {
