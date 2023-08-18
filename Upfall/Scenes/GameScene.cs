@@ -91,6 +91,9 @@ internal class GameScene : Scene
                     return;
                 }
             }
+
+            SceneManager.Change("Game");
+            return;
         }
 
         if (!_waitForEndParticles && (_player.IsDead || _player.WonLevel))
