@@ -32,6 +32,7 @@ internal class Program
         game.AddSystem<ShaderEffectSystem>();
         game.AddSystem<PaletteSystem>();
 
+        SceneManager.Add("Splash", new SplashScene());
         SceneManager.Add("Menu", new MenuScene());
         SceneManager.Add("Game", new GameScene());
         SceneManager.Add("Editor", new EditScene());
