@@ -7,6 +7,8 @@ using Brocco.Menu;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SDL2;
+using Upfall.Entities;
 
 namespace Upfall.Scenes;
 
@@ -42,6 +44,8 @@ public class MenuScene : Scene
     
     public override void Load()
     {
+        AddToScene<TitleEntity>();
+        
         ScreenEffect = Assets.GetEffect("DynamicOneBit");
 
         _tinyUnicodeFont = Assets.GetFontSystem("Tiny Unicode");
