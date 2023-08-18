@@ -10,7 +10,7 @@
     
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <ApplicationIcon>upfall.ico</ApplicationIcon>
+        <ApplicationIcon>Upfall.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,7 +39,7 @@
         <CFBundlePackageType>APPL</CFBundlePackageType>
         <CFBundleSignature>????</CFBundleSignature>
         <CFBundleExecutable>Upfall</CFBundleExecutable>
-        <CFBundleIconFile>upfall.icns</CFBundleIconFile>
+        <CFBundleIconFile>Upfall.icns</CFBundleIconFile>
         <LSMinimumSystemVersion>10.12</LSMinimumSystemVersion>
     </PropertyGroup>
 
