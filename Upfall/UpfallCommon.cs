@@ -47,7 +47,7 @@ public static class UpfallCommon
     public static bool Playtesting = false;
 
     public static readonly string GamePath = Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? "";
-    public static readonly string LevelsPath = Path.Join(Assets.AssetsPath, "Levels");
+    public static readonly string LevelsPath = Path.Join(GamePath, "Content", "Levels");
     public static readonly string CustomLevelsPath = Path.Join(LevelsPath, "Levels");
 
     public static readonly string TilesPath = Path.Join(GamePath, "Content", "Maps");
