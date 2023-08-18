@@ -33,6 +33,7 @@
     <ItemGroup>
         <PackageReference Include="NativeFileDialogSharp" Version="0.5.0" />
         <PackageReference Include="Dotnet.Bundle" Version="*" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
     
     <PropertyGroup>

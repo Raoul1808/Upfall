@@ -1,12 +1,31 @@
-﻿using Brocco;
+﻿using System.IO;
+using System.Reflection;
+using Brocco;
 using Brocco.Basic;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Upfall.Scenes;
 
 namespace Upfall;
 
 internal class Program
 {
+    private struct GameSettings
+    {
+        public bool DisplayCustomPalettes { get; set; }
+        public int AudioVolume { get; set; }
+
+        public GameSettings()
+        {
+            DisplayCustomPalettes = true;
+            AudioVolume = 10;
+        }
+    }
+
+    private const string SettingsFile = "Settings.json";
+    private static readonly string GamePath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+    private static readonly string ConfigLocation = Path.Join(GamePath, SettingsFile);
+    
     public static void Main()
     {
         var gameSettings = new BroccoGameSettings
@@ -38,6 +57,24 @@ internal class Program
         SceneManager.Add("Game", new GameScene());
         SceneManager.Add("Editor", new EditScene());
 
+        GameSettings settings;
+        try
+        {
+            settings = JsonConvert.DeserializeObject<GameSettings>(File.ReadAllText(ConfigLocation));
+        }
+        catch
+        {
+            settings = new GameSettings();
+        }
+
+        AudioManager.Volume = settings.AudioVolume;
+        PaletteSystem.PreSetDisplayPaletteOption(settings.DisplayCustomPalettes);
+
         game.Run();
+
+        settings.AudioVolume = AudioManager.Volume;
+        settings.DisplayCustomPalettes = PaletteSystem.DisplayCustomPalettes;
+
+        File.WriteAllText(ConfigLocation, JsonConvert.SerializeObject(settings));
     }
 }
