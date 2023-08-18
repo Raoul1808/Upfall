@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework;
@@ -48,4 +50,31 @@ public static class UpfallCommon
     public static readonly string TilesPath = Path.Join(GamePath, "Content", "Maps");
 
     public static Vector2 ScreenCenter;
+
+    // Levels and shit
+    
+    private static List<string> _currentLevelSet;
+    private static int _currentLevel;
+
+    public static void SetLevelSet(List<string> levelset, int startingLevel = 0)
+    {
+        _currentLevelSet = levelset;
+        _currentLevel = startingLevel;
+    }
+
+    public static bool HasNextLevel()
+    {
+        return _currentLevel < _currentLevelSet.Count - 1;
+    }
+
+    public static void NextLevel() => _currentLevel++;
+
+    public static Tilemap LoadCurrentLevel() => LoadLevel(_currentLevel);
+
+    public static Tilemap LoadLevel(int level)
+    {
+        level = Math.Clamp(level, 0, _currentLevelSet.Count - 1);
+        var tilemap = Tilemap.LoadFromFile(_currentLevelSet[level]);
+        return tilemap;
+    }
 }

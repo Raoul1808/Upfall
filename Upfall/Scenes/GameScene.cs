@@ -25,7 +25,7 @@ internal class GameScene : Scene
     {
         _waitForEndParticles = false;
         UpfallCommon.OnWorldChange += SetCircleAnim;
-        _tilemap = Tilemap.LoadFromFile(UpfallCommon.Playtesting ? EditScene.TilemapToLoad : "map.umd");
+        _tilemap = UpfallCommon.Playtesting ? Tilemap.LoadFromFile(EditScene.TilemapToLoad) : UpfallCommon.LoadCurrentLevel();
         PaletteSystem.SetPalette(_tilemap.LevelPalette, UpfallCommon.Playtesting ? 0f : 1f);
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
         _player = AddToScene<Player>();
@@ -73,13 +73,26 @@ internal class GameScene : Scene
             return;  // Don't execute further
         }
 
-        if (_waitForEndParticles && ParticleSystem.DeathParticlesDone())
+        if (_player.IsDead && _waitForEndParticles && ParticleSystem.DeathParticlesDone())
         {
             SceneManager.Change("Game");
             return;
         }
-        
-        // TODO: add more gentle transitions
+
+        if (_player.WonLevel && _waitForEndParticles && ParticleSystem.DeathParticlesDone())
+        {
+            if (!UpfallCommon.Playtesting)
+            {
+                if (UpfallCommon.HasNextLevel())
+                    UpfallCommon.NextLevel();
+                else
+                {
+                    SceneManager.Change("Menu");
+                    return;
+                }
+            }
+        }
+
         if (!_waitForEndParticles && (_player.IsDead || _player.WonLevel))
         {
             _waitForEndParticles = true;
