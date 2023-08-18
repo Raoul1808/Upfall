@@ -349,9 +349,9 @@ public class EditScene : Scene
 
             if (InputManager.GetKeyPress(Keys.T) && SaveLevel())
             {
-                SceneManager.Change("Game");
                 UpfallCommon.Playtesting = true;
                 NotificationSystem.SendNotification("Now playing level " + _levelFilename);
+                SceneManager.Change("Game");
                 return;  // Don't execute further
             }
 
