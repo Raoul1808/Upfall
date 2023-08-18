@@ -90,7 +90,8 @@ public class MenuScene : Scene
             List<string> levels = new();
             foreach (string file in Directory.EnumerateFiles(directory))
             {
-                levels.Add(file);
+                if (file.EndsWith(".umd"))
+                    levels.Add(file);
             }
 
             if (levels.Count > 0)
@@ -103,6 +104,7 @@ public class MenuScene : Scene
         var levelsetNames = levelsets.Keys.ToList();
         int officialSetIndex = levelsetNames.IndexOf("Official");
         _selectedLevelSet = "Official";
+        _selectedLevel = 0;
 
         _levelSetSelect = MenuBuilder.CreateMenu(_tinyUnicodeFont, UpfallCommon.ScreenCenter, _menuSettings)
             .AddArraySelect("Level Set", levelsetNames.ToArray(), officialSetIndex, action: (_, set) => _selectedLevelSet = set)
@@ -118,10 +120,13 @@ public class MenuScene : Scene
 
     private void ShowLevelSelection()
     {
+        _selectedLevel = 0;
         var levelSet = _detectedLevelSets[_selectedLevelSet];
+        List<string> levels = new();
+        foreach (string level in levelSet)
+            levels.Add(Path.GetFileNameWithoutExtension(level));
         _levelSelect = MenuBuilder.CreateMenu(_tinyUnicodeFont, UpfallCommon.ScreenCenter, _menuSettings)
-            .AddArraySelect("Level", levelSet.ToArray(),
-                action: (_, level) => _selectedLevel = levelSet.IndexOf(level))
+            .AddArraySelect("Level", levels.ToArray(), action: (_, level) => _selectedLevel = levels.IndexOf(level))
             .AddButton("Play", _ => StartLevel())
             .AddButton("Back", _ => _currentMenu = MenuState.LevelSetSelect)
             .Build();
