@@ -176,7 +176,7 @@ public class EditScene : Scene
             return;
         }
 
-        Color colA = ColorUtil.HexToCol(darkHex + "ff");
+        Color colA = ColorUtil.HexToCol(darkHex);
 
         string lightHex = _simpleLightCol.ToLower();
         if (!ColorUtil.IsValidRgbHex(lightHex))
@@ -185,7 +185,7 @@ public class EditScene : Scene
             return;
         }
 
-        Color colB = ColorUtil.HexToCol(lightHex + "ff");
+        Color colB = ColorUtil.HexToCol(lightHex);
 
         var palette = new SimplePalette
         {
@@ -204,7 +204,7 @@ public class EditScene : Scene
             NotificationSystem.SendNotification("Invalid hex color for Dark Color 1");
             return;
         }
-        Color colA = ColorUtil.HexToCol(darkHex1 + "ff");
+        Color colA = ColorUtil.HexToCol(darkHex1);
         
         string darkHex2 = _lerpDarkCol2.ToLower();
         if (!ColorUtil.IsValidRgbHex(darkHex2))
@@ -212,7 +212,7 @@ public class EditScene : Scene
             NotificationSystem.SendNotification("Invalid hex color for Dark Color 2");
             return;
         }
-        Color colB = ColorUtil.HexToCol(darkHex2 + "ff");
+        Color colB = ColorUtil.HexToCol(darkHex2);
 
         string lightHex1 = _lerpLightCol1.ToLower();
         if (!ColorUtil.IsValidRgbHex(lightHex1))
@@ -220,7 +220,7 @@ public class EditScene : Scene
             NotificationSystem.SendNotification("Invalid hex color for Light Color 1");
             return;
         }
-        Color colC = ColorUtil.HexToCol(lightHex1 + "ff");
+        Color colC = ColorUtil.HexToCol(lightHex1);
 
         string lightHex2 = _lerpLightCol2.ToLower();
         if (!ColorUtil.IsValidRgbHex(lightHex2))
@@ -228,7 +228,7 @@ public class EditScene : Scene
             NotificationSystem.SendNotification("Invalid hex color for Light Color 2");
             return;
         }
-        Color colD = ColorUtil.HexToCol(lightHex2 + "ff");
+        Color colD = ColorUtil.HexToCol(lightHex2);
 
         var palette = new LerpPalette()
         {

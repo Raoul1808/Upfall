@@ -120,24 +120,19 @@ public static class ColorUtil
     
     public static Color HexToCol(string hex)
     {
-        uint rgba = uint.Parse(hex, System.Globalization.NumberStyles.HexNumber);
-        var bytes = BitConverter.GetBytes(rgba);
-        return new Color(bytes[0], bytes[1], bytes[2], bytes[3]);
+        uint rgb = uint.Parse(hex, System.Globalization.NumberStyles.HexNumber);
+        var bytes = BitConverter.GetBytes(rgb);
+        return new Color(bytes[2], bytes[1], bytes[0], 255);
     }
 
     public static string ColToHex(Color col)
     {
-        uint rgba = (uint)((col.R << 24) + (col.G << 16) + (col.B << 8) + col.A);
-        return rgba.ToString("x8");
+        uint rgba = (uint)((col.R << 16) + (col.G << 8) + col.B);
+        return rgba.ToString("x6");
     }
 
     public static bool IsValidRgbHex(string hex)
     {
         return Regex.IsMatch(hex, @"[0-9a-f]{6}\b");
-    }
-    
-    public static bool IsValidRgbaHex(string hex)
-    {
-        return Regex.IsMatch(hex, @"[0-9a-f]{8}\b");
     }
 }
