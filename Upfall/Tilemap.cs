@@ -369,13 +369,12 @@ public class Tilemap
 
     private string RectToStr(Rectangle rect) => $"{{Left: {rect.Left}, Right: {rect.Right}, Top: {rect.Top}, Bottom: {rect.Bottom}}}";
     
-    public void SolveCollisions(TilemapEntity entity)
+    public void SolveCollisions(Player entity)
     {
-        var isPlayer = entity.GetType() == typeof(Player);
-        if (_keyCount <= 0 && isPlayer && entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
+        if (entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
         {
             // Trigger level win immediately
-            ((Player)entity).Win();
+            entity.Win();
             return;  // We don't want to process collisions
         }
         var pos = entity.Position / TileSize;
@@ -397,7 +396,7 @@ public class Tilemap
                 var tileRect = GetTileRect(x, y, tile);
                 if (tile.TileId != 0 && bbox.Intersects(tileRect))
                 {
-                    if (isPlayer && tile.TileId == TileType.Key)
+                    if (tile.TileId == TileType.Key)
                     {
                         RemoveKey(x, y);
                         continue;  // Collect the key and restart collision checking
@@ -412,7 +411,7 @@ public class Tilemap
             }
         }
 
-        if (isPlayer && kill)
+        if (kill)
         {
             entity.Kill();
             return;
@@ -468,7 +467,7 @@ public class Tilemap
                 }
             }
 
-            if (isPlayer && shouldCrossPortal && tile.TileId == TileType.Portal)
+            if (shouldCrossPortal && tile.TileId == TileType.Portal)
             {
                 // This basically boils down to this
                 // 1. Get the player's previous position from his current velocity
