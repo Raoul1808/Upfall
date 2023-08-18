@@ -250,7 +250,7 @@ public class EditScene : Scene
 
     private void SaveToNewLocation()
     {
-        DialogResult res = Dialog.FileSave("umd", UpfallCommon.GamePath);
+        DialogResult res = Dialog.FileSave("umd", UpfallCommon.CustomLevelsPath);
         if (res.IsOk)
         {
             _levelFilename = res.Path;
@@ -276,7 +276,7 @@ public class EditScene : Scene
 
     private void OpenLevel()
     {
-        DialogResult res = Dialog.FileOpen("umd", UpfallCommon.GamePath);
+        DialogResult res = Dialog.FileOpen("umd", UpfallCommon.CustomLevelsPath);
         if (res.IsOk)
         {
             _levelFilename = res.Path;
