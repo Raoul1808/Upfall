@@ -50,6 +50,7 @@ public static class UpfallCommon
     public static readonly string TilesPath = Path.Join(GamePath, "Content", "Maps");
 
     public static Vector2 ScreenCenter;
+    public static Vector2 CanvasCenter;
 
     // Levels and shit
     
@@ -75,6 +76,7 @@ public static class UpfallCommon
     {
         level = Math.Clamp(level, 0, _currentLevelSet.Count - 1);
         var tilemap = Tilemap.LoadFromFile(_currentLevelSet[level]);
+        NotificationSystem.ShowLevelName(tilemap.LevelName, tilemap.LevelAuthor);
         return tilemap;
     }
 }

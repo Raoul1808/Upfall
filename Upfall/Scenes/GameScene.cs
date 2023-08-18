@@ -17,7 +17,7 @@ internal class GameScene : Scene
     public override void Load()
     {
         Assets.GetTexture("tileset");
-        CanvasEffect = Assets.GetEffect("DynamicOneBit");
+        ScreenEffect = Assets.GetEffect("DynamicOneBit");
         BlendState = BlendState.Additive;
     }
 
@@ -137,5 +137,11 @@ internal class GameScene : Scene
         base.CanvasRender(spriteBatch);
         _tilemap.Render(spriteBatch);
         ParticleSystem.RenderParticles(spriteBatch);
+    }
+
+    public override void ScreenRender(SpriteBatch spriteBatch)
+    {
+        if (NotificationSystem.CanRenderName())
+            NotificationSystem.RenderName(spriteBatch);
     }
 }

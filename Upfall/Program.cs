@@ -20,6 +20,7 @@ internal class Program
         game.Window.Title = "Upfall v" + UpfallCommon.ShortVersion;
 
         UpfallCommon.ScreenCenter = gameSettings.Resolution?.ToVector2() / 2f ?? new Vector2();  // wtf
+        UpfallCommon.CanvasCenter = gameSettings.CanvasSize.ToVector2() / 2f;
 
         Assets.FontsRoot = "Fonts";
         Assets.SoundsRoot = "Sounds";
