@@ -115,7 +115,7 @@ internal class GameScene : Scene
 
         base.Update(dt);
         
-        if (!_player.IsDead)
+        if (!_player.IsDead && !_player.WonLevel)
             _tilemap.SolveCollisions(_player);
         
         ShaderEffectSystem.SetCircleCanvasPos(_player.Position);

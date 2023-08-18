@@ -157,6 +157,8 @@ public class Player : TilemapEntity
         // Win code
         WonLevel = true;
         AudioManager.PlayWorldSound("leveldone");
+        ParticleSystem.SpawnDeathParticles(Position);
         Velocity = Vector2.Zero;
+        Dispose();
     }
 }
