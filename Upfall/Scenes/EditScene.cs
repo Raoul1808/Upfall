@@ -266,6 +266,9 @@ public class EditScene : Scene
             return false;
         }
 
+        if (!_levelFilename.EndsWith(".umd"))
+            _levelFilename += ".umd";
+
         _tilemap.SaveToFile(_levelFilename);
         NotificationSystem.SendNotification("Saved Level to " + _levelFilename);
         return true;
