@@ -101,6 +101,7 @@ public class MenuScene : Scene
 
             if (levels.Count > 0)
             {
+                levels.Sort();
                 string dirName = Path.GetFileName(directory);
                 levelsets.Add(dirName, levels);
             }
