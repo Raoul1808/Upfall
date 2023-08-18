@@ -18,11 +18,6 @@ internal class GameScene : Scene
     {
         Assets.GetTexture("tileset");
         CanvasEffect = Assets.GetEffect("DynamicOneBit");
-        if (CanvasEffect != null)
-        {
-            CanvasEffect.Parameters["BitColor1"].SetValue(Color.Blue.ToVector4());
-            CanvasEffect.Parameters["BitColor2"].SetValue(Color.CornflowerBlue.ToVector4());
-        }
         BlendState = BlendState.Additive;
     }
 
