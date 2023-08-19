@@ -111,7 +111,7 @@ public class EditScene : Scene
         PaletteSystem.ResetPalette(0f);
         if (!UpfallCommon.Playtesting)
             RefreshEditor();
-        UpfallCommon.CurrentWorldMode = WorldMode.Dark;
+        UpfallCommon.CurrentWorldMode = WorldMode.Common;
         UpfallCommon.InEditor = true;
         UpfallCommon.Playtesting = false;
         _currentTileId = TileType.Solid;
@@ -441,10 +441,23 @@ public class EditScene : Scene
                 return;
         }
 
-        if (!tile.HasDirection())
+        if (tile == TileType.Solid)
             direction = Direction.Right;
         
-        _tilemap.SetTile(pos, tile, direction);
+        switch (UpfallCommon.CurrentWorldMode)
+        {
+            case WorldMode.Common:
+                _tilemap.SetCommonTile(pos, tile, direction);
+                break;
+
+            case WorldMode.Dark:
+                _tilemap.SetDarkTile(pos, tile, direction);
+                break;
+
+            case WorldMode.Light:
+                _tilemap.SetLightTile(pos, tile, direction);
+                break;
+        }
     }
 
     public override void CanvasRender(SpriteBatch spriteBatch)
