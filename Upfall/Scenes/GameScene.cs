@@ -116,7 +116,8 @@ internal class GameScene : Scene
             }
 
             // If player is OOB, kill him
-            if (_player.BoundingBox.Top > _tilemap.GetBottom() || _player.BoundingBox.Bottom < _tilemap.GetTop())
+            if ((_player.BoundingBox.Top > _tilemap.GetBottom() && UpfallCommon.CurrentWorldMode == WorldMode.Dark) ||  // Player below the map and is falling down
+                (_player.BoundingBox.Bottom < _tilemap.GetTop() && UpfallCommon.CurrentWorldMode == WorldMode.Light))  // Player above the the map and is falling up
             {
                 _player.Kill();
             }
