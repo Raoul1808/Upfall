@@ -266,7 +266,7 @@ public class EditScene : Scene
 
     private void SaveToNewLocation()
     {
-        DialogResult res = Dialog.FileSave("umd", UpfallCommon.CustomLevelsPath);
+        DialogResult res = Dialog.FileSave("umd", UpfallCommon.LevelsPath);
         if (res.IsOk)
         {
             _levelFilename = res.Path;
@@ -339,7 +339,7 @@ public class EditScene : Scene
 
             if (InputManager.GetKeyPress(Keys.O))
             {
-                DialogResult res = Dialog.FileOpen("umd", UpfallCommon.GamePath);
+                DialogResult res = Dialog.FileOpen("umd", UpfallCommon.LevelsPath);
                 if (!res.IsOk)
                     NotificationSystem.SendNotification("Open File Request Cancelled.");
                 try
