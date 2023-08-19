@@ -307,7 +307,7 @@ public class Tilemap
     
     public void SolveCollisions(Player entity)
     {
-        if (entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
+        if (_keyCount <= 0 && entity.BoundingBox.Intersects(GetExitRect(_endPoint.X, _endPoint.Y)))
         {
             // Trigger level win immediately
             entity.Win();
