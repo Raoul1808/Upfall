@@ -387,8 +387,7 @@ public class Tilemap
         int uy = Math.Min((int)pos.Y + 2, _tiles.GetLength(0) - 1);
 
         var tileRects = new List<Tuple<float, Tile, Rectangle>>();
-
-        bool kill = false;
+        var lethalRects = new List<Rectangle>();
 
         for (int x = lx; x <= ux; x++)
         {
@@ -404,20 +403,13 @@ public class Tilemap
                         RemoveKey(x, y);
                         continue;  // Collect the key and restart collision checking
                     }
-                    
+
                     if (tile.TileId.IsLethal())
-                    {
-                        kill = true;
-                    }
-                    tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tile, tileRect));
+                        lethalRects.Add(tileRect);  // Process death AFTER tile collisions
+                    else
+                        tileRects.Add(new(BroccoMath.Distance(bbox.Center, tileRect.Center), tile, tileRect));
                 }
             }
-        }
-
-        if (kill)
-        {
-            entity.Kill();
-            return;
         }
 
         if (tileRects.Count <= 0) return;  // No collision detected?
@@ -517,6 +509,16 @@ public class Tilemap
                     UpfallCommon.CycleWorldMode();
                     shouldCrossPortal = false;
                 }
+            }
+        }
+
+        // Process stored death zones
+        foreach (Rectangle rect in lethalRects)
+        {
+            if (entity.BoundingBox.Intersects(rect))
+            {
+                entity.Kill();
+                break;
             }
         }
     }
