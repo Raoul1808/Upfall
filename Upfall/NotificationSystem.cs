@@ -63,12 +63,19 @@ public class NotificationSystem : BroccoAutoSystem
 
     public static void RenderName(SpriteBatch spriteBatch)
     {
-        var titleFont = _tinyUnicodeFont.GetFont(48);
-        var authorFont = _tinyUnicodeFont.GetFont(32);
-        string author = "Created by " + _levelAuthor;
-        var titleOffset = new Vector2(titleFont.MeasureString(_levelName).X / 2f, 48);
-        var authorOffset = new Vector2(authorFont.MeasureString(author).X / 2f, 32);
-        spriteBatch.DrawString(titleFont, _levelName, _titlePos, Color.White, origin: titleOffset, effect: FontSystemEffect.Stroked, effectAmount: 2);
-        spriteBatch.DrawString(authorFont, author, _authorPos, Color.White, origin: authorOffset, effect: FontSystemEffect.Stroked, effectAmount: 2);
+        if (_levelName != string.Empty)
+        {
+            var titleFont = _tinyUnicodeFont.GetFont(48);
+            var titleOffset = new Vector2(titleFont.MeasureString(_levelName).X / 2f, 48);
+            spriteBatch.DrawString(titleFont, _levelName, _titlePos, Color.White, origin: titleOffset, effect: FontSystemEffect.Stroked, effectAmount: 2);
+        }
+
+        if (_levelAuthor != string.Empty)
+        {
+            var authorFont = _tinyUnicodeFont.GetFont(32);
+            string author = "Created by " + _levelAuthor;
+            var authorOffset = new Vector2(authorFont.MeasureString(author).X / 2f, 32);
+            spriteBatch.DrawString(authorFont, author, _authorPos, Color.White, origin: authorOffset, effect: FontSystemEffect.Stroked, effectAmount: 2);
+        }
     }
 }
