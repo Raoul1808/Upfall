@@ -444,7 +444,7 @@ public class EditScene : Scene
         if (!tile.HasDirection())
             direction = Direction.Right;
         
-        _tilemap.SetTile(_currentTilePos, _currentTileId, direction);
+        _tilemap.SetTile(pos, tile, direction);
     }
 
     public override void CanvasRender(SpriteBatch spriteBatch)
