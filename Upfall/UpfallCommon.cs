@@ -39,7 +39,7 @@ public static class UpfallCommon
         var mode = _currentWorldMode;
         mode += 1;
         if (mode > WorldMode.Light)
-            mode = InEditor ? WorldMode.Common : WorldMode.Dark;
+            mode = WorldMode.Dark;
         CurrentWorldMode = mode;
     }
     

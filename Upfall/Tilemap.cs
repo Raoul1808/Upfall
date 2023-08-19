@@ -12,7 +12,6 @@ namespace Upfall;
 
 public class Tilemap
 {
-    private Tile[,] _tiles;
     private Tile[,] _darkTiles;
     private Tile[,] _lightTiles;
     private Size _tilemapSize;
@@ -34,26 +33,33 @@ public class Tilemap
     public Tilemap(Size size)
     {
         _tilemapSize = size;
-        _tiles = new Tile[size.Height, size.Width];
         _darkTiles = new Tile[size.Height, size.Width];
         _lightTiles = new Tile[size.Height, size.Width];
         _keyCount = 0;
         LevelPalette = PaletteSystem.GetDefaultPalette();
     }
 
-    public void SetCommonTile(Point pos, TileType tile, Direction direction)
+    public void SetTile(Point pos, TileType tile, Direction direction)
     {
-        _tiles[pos.Y, pos.X].TileId = tile;
-        _tiles[pos.Y, pos.X].Direction = direction;
+        switch (UpfallCommon.CurrentWorldMode)
+        {
+            case WorldMode.Dark:
+                SetTileDark(pos, tile, direction);
+                break;
+            
+            case WorldMode.Light:
+                SetTileLight(pos, tile, direction);
+                break;
+        }
     }
 
-    public void SetDarkTile(Point pos, TileType tile, Direction direction)
+    public void SetTileDark(Point pos, TileType tile, Direction direction)
     {
         _darkTiles[pos.Y, pos.X].TileId = tile;
         _darkTiles[pos.Y, pos.X].Direction = direction;
     }
 
-    public void SetLightTile(Point pos, TileType tile, Direction direction)
+    public void SetTileLight(Point pos, TileType tile, Direction direction)
     {
         _lightTiles[pos.Y, pos.X].TileId = tile;
         _lightTiles[pos.Y, pos.X].Direction = direction;
@@ -69,60 +75,28 @@ public class Tilemap
         _endPoint = pos;
     }
 
-    public Tile GetTileCommon(int x, int y) => _tiles[y, x];
-
     public Tile GetTileDark(int x, int y) => _darkTiles[y, x];
 
     public Tile GetTileLight(int x, int y) => _lightTiles[y, x];
 
     public Tile GetTile(int x, int y)
     {
-        Tile tile = GetTileCommon(x, y);
-        if (tile.TileId == 0)
+        return UpfallCommon.CurrentWorldMode switch
         {
-            switch (UpfallCommon.CurrentWorldMode)
-            {
-                case WorldMode.Dark:
-                    return GetTileDark(x, y);
-
-                case WorldMode.Light:
-                    return GetTileLight(x, y);
-            }
-        }
-
-        return tile;
+            WorldMode.Dark => GetTileDark(x, y),
+            WorldMode.Light => GetTileLight(x, y),
+            _ => GetTileDark(x, y),
+        };
     }
 
     public void RemoveKey(int x, int y)
     {
         if (_keyCount <= 0)
             return;  // There are no keys left in the level. Return
-        WorldMode mode;
-        Tile tile = GetTileCommon(x, y);
+        
+        Tile tile = GetTile(x, y);
         if (tile.TileId != TileType.Key)
-        {
-            // Key not found in common tiles, search further
-            switch (UpfallCommon.CurrentWorldMode)
-            {
-                case WorldMode.Dark:
-                    tile = GetTileDark(x, y);
-                    break;
-
-                case WorldMode.Light:
-                    tile = GetTileLight(x, y);
-                    break;
-            }
-
-            mode = UpfallCommon.CurrentWorldMode;
-
-            if (tile.TileId != TileType.Key)
-            {
-                // Key not found. Break
-                return;
-            }
-        }
-        else
-            mode = WorldMode.Common;
+            return;  // Key not found
 
         _keyCount--;
         AudioManager.PlayWorldSound("pickup");
@@ -130,20 +104,7 @@ public class Tilemap
         if (_keyCount <= 0)
             AudioManager.PlayWorldSound("unlock");
         
-        switch (mode)
-        {
-            case WorldMode.Common:
-                SetCommonTile(new(x, y), TileType.None, Direction.Left);
-                break;
-
-            case WorldMode.Dark:
-                SetDarkTile(new(x, y), TileType.None, Direction.Left);
-                break;
-
-            case WorldMode.Light:
-                SetLightTile(new(x, y), TileType.None, Direction.Left);
-                break;
-        }
+        SetTile(new Point(x, y), TileType.Key, Direction.Left);
     }
 
     public Vector2 GetSpawnPos() => GetTilePos(_spawnPoint).ToVector2() + HalfTile;
@@ -195,7 +156,6 @@ public class Tilemap
         int endX = int.Parse(reader.ReadLine() ?? "0");
         int endY = int.Parse(reader.ReadLine() ?? "0");
         var size = new Size(width, height);
-        var tiles = new Tile[height, width];
         var darkTiles = new Tile[height, width];
         var lightTiles = new Tile[height, width];
         int keyCount = 0;
@@ -208,20 +168,7 @@ public class Tilemap
                 var tileId = (TileType)line[col];
                 if (tileId == TileType.Key)
                     keyCount++;
-                tiles[row, col / 2].TileId = tileId;
-                tiles[row, col / 2].Direction = (Direction)line[col + 1];
-            }
-        }
-        for (int row = 0; row < size.Height; row++)
-        {
-            var line = reader.ReadLine() ?? new string('0', size.Width * 2);
-            
-            for (int col = 0; col < size.Width * 2; col += 2)
-            {
-                var tileId = (TileType)line[col];
-                if (tileId == TileType.Key)
-                    keyCount++;
-                darkTiles[row, col / 2].TileId = (TileType)line[col];
+                lightTiles[row, col / 2].TileId = tileId;
                 darkTiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
         }
@@ -234,7 +181,7 @@ public class Tilemap
                 var tileId = (TileType)line[col];
                 if (tileId == TileType.Key)
                     keyCount++;
-                lightTiles[row, col / 2].TileId = (TileType)line[col];
+                darkTiles[row, col / 2].TileId = tileId;
                 lightTiles[row, col / 2].Direction = (Direction)line[col + 1];
             }
         }
@@ -248,7 +195,6 @@ public class Tilemap
 
         return new Tilemap
         {
-            _tiles = tiles,
             _darkTiles = darkTiles,
             _lightTiles = lightTiles,
             _tilemapSize = size,
@@ -337,16 +283,6 @@ public class Tilemap
         {
             for (int col = 0; col < _tilemapSize.Width; col++)
             {
-                var tile = _tiles[row, col];
-                writer.Write((char)tile.TileId);
-                writer.Write((char)tile.Direction);
-            }
-            writer.WriteLine();
-        }
-        for (int row = 0; row < _tilemapSize.Height; row++)
-        {
-            for (int col = 0; col < _tilemapSize.Width; col++)
-            {
                 var tile = _darkTiles[row, col];
                 writer.Write((char)tile.TileId);
                 writer.Write((char)tile.Direction);
@@ -379,9 +315,9 @@ public class Tilemap
         }
         var pos = entity.Position / TileSize;
         int lx = Math.Max((int)pos.X - 1, 0);
-        int ux = Math.Min((int)pos.X + 2, _tiles.GetLength(1) - 1);
+        int ux = Math.Min((int)pos.X + 2, _tilemapSize.Width - 1);
         int ly = Math.Max((int)pos.Y - 1, 0);
-        int uy = Math.Min((int)pos.Y + 2, _tiles.GetLength(0) - 1);
+        int uy = Math.Min((int)pos.Y + 2, _tilemapSize.Height - 1);
 
         var tileRects = new List<Tuple<float, Tile, Rectangle>>();
 
@@ -520,7 +456,6 @@ public class Tilemap
 
     public void Render(SpriteBatch spriteBatch)
     {
-        RenderLayer(spriteBatch, WorldMode.Common, Color.Fuchsia);
         RenderLayer(spriteBatch, WorldMode.Dark, Color.Red);
         RenderLayer(spriteBatch, WorldMode.Light, Color.Blue);
         RenderTile(spriteBatch, Color.White, _endPoint, TileType.ExitDoor);
@@ -546,12 +481,12 @@ public class Tilemap
         {
             WorldMode.Dark => _darkTiles,
             WorldMode.Light => _lightTiles,
-            _ => _tiles,
+            _ => _darkTiles,
         };
 
-        for (int row = 0; row < _tiles.GetLength(0); row++)
+        for (int row = 0; row < _tilemapSize.Height; row++)
         {
-            for (int col = 0; col < _tiles.GetLength(1); col++)
+            for (int col = 0; col < _tilemapSize.Width; col++)
             {
                 Tile tile = layer[row, col];
                 RenderTile(spriteBatch, color, new(col, row), tile);
