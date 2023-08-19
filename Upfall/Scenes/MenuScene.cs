@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,6 @@ using Brocco.Menu;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SDL2;
 using Upfall.Entities;
 
 namespace Upfall.Scenes;
@@ -108,8 +106,8 @@ public class MenuScene : Scene
         }
 
         var levelsetNames = levelsets.Keys.ToList();
-        int officialSetIndex = levelsetNames.IndexOf("Official");
-        _selectedLevelSet = "Official";
+        int officialSetIndex = levelsetNames.IndexOf("Upfall");
+        _selectedLevelSet = "Upfall";
         _selectedLevel = 0;
 
         _levelSetSelect = MenuBuilder.CreateMenu(_tinyUnicodeFont, UpfallCommon.ScreenCenter, _menuSettings)
