@@ -244,11 +244,6 @@ public class Tilemap
 
         reader.Dispose();
 
-        if (palette is LerpPalette lerp)
-        {
-            Console.WriteLine("Lerp palette colors: " + lerp.DarkColor1 + " " + lerp.DarkColor2 + " " + lerp.LightColor1 + " " + lerp.LightColor2);
-        }
-
         return new Tilemap
         {
             _tiles = tiles,
