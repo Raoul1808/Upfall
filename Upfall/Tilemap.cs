@@ -587,8 +587,6 @@ public class Tilemap
 
             Rectangle? srcRect = tileId == TileType.Portal ? AnimationHelper.GetPortalSourceRectangle() : null;
             spriteBatch.Draw(tex, rect, srcRect, color, -rot, offset, SpriteEffects.None, 0f);
-            if (tileId == TileType.Spike)
-                spriteBatch.Draw(Assets.Pixel, GetTileRect(pos.X, pos.Y, tileId, direction), Color.Green * 1f);
         }
     }
 }
