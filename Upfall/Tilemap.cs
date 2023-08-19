@@ -39,6 +39,8 @@ public class Tilemap
         _lightTiles = new Tile[size.Height, size.Width];
         _keyCount = 0;
         LevelPalette = PaletteSystem.GetDefaultPalette();
+        LevelName = "Untitled";
+        LevelAuthor = "Unknown";
     }
 
     public void SetCommonTile(Point pos, TileType tile, Direction direction)
