@@ -411,8 +411,6 @@ public class Tilemap
                 }
             }
         }
-
-        if (tileRects.Count <= 0) return;  // No collision detected?
         
         tileRects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
 
