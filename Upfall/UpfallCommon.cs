@@ -60,9 +60,12 @@ public static class UpfallCommon
     private static List<string> _currentLevelSet;
     private static int _currentLevel;
     private static string _previousLevelTextDisplayed = string.Empty;
+    private static string _levelSetName = string.Empty;
+    private static int _deathCount;
 
-    public static void SetLevelSet(List<string> levelset, int startingLevel = 0)
+    public static void SetLevelSet(string levelSetName, List<string> levelset, int startingLevel = 0)
     {
+        _levelSetName = levelSetName;
         _currentLevelSet = levelset;
         _currentLevel = startingLevel;
     }
@@ -90,4 +93,10 @@ public static class UpfallCommon
     }
 
     public static void ResetPreviousLevelTextDisplayed() => _previousLevelTextDisplayed = string.Empty;
+
+    public static string GetLevelSetName() => _levelSetName;
+    public static void LeaveLevelSet() => _levelSetName = string.Empty;
+    public static void IncreaseDeathCount() => _deathCount++;
+    public static int GetDeathCount() => _deathCount;
+    public static void ResetDeathCount() => _deathCount = 0;
 }

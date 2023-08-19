@@ -146,6 +146,7 @@ public class Player : TilemapEntity
     {
         // 🦀 The player is dead 🦀
         IsDead = true;
+        UpfallCommon.IncreaseDeathCount();
         AudioManager.PlayWorldSound("death");
         ParticleSystem.SpawnDeathParticles(Position);
         Dispose();

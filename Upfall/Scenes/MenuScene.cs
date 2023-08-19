@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Brocco;
 using Brocco.Menu;
 using FontStashSharp;
+using FontStashSharp.RichText;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Upfall.Entities;
@@ -18,6 +20,7 @@ public class MenuScene : Scene
         OptionsMenu,
         LevelSetSelect,
         LevelSelect,
+        LevelSetEnd,
     }
 
     private string LevelsDirectory => Path.Join(Assets.AssetsPath, "Levels");
@@ -26,6 +29,8 @@ public class MenuScene : Scene
     private MenuObject _optionsMenu;
     private MenuObject _levelSetSelect;
     private MenuObject _levelSelect;
+    private MenuObject _levelSetEnd;
+    private RichTextLayout _levelSetEndText;
     private MenuState _currentMenu;
 
     private FontSystem _tinyUnicodeFont;
@@ -64,13 +69,35 @@ public class MenuScene : Scene
 
     public override void OnBecomeActive()
     {
-        _currentMenu = MenuState.MainMenu;
+        if (UpfallCommon.GetLevelSetName() != string.Empty)
+        {
+            _currentMenu = MenuState.LevelSetEnd;
+            StringBuilder sb = new StringBuilder();
+            var menuPos = UpfallCommon.ScreenCenter;
+            sb.Append("Level Set " + UpfallCommon.GetLevelSetName() + " Complete!/n");
+            sb.Append("Death Count: " + UpfallCommon.GetDeathCount());
+            menuPos.Y += 128f + 64f;
+            
+            _levelSetEndText = new RichTextLayout()
+            {
+                Font = _tinyUnicodeFont.GetFont(64),
+                Text = sb.ToString(),
+            };
+
+            _levelSetEnd = MenuBuilder.CreateMenu(_tinyUnicodeFont, menuPos, _menuSettings)
+                .AddButton("Press Enter/A to continue", _ => _currentMenu = MenuState.MainMenu)
+                .Build();
+        }
+        else
+            _currentMenu = MenuState.MainMenu;
         UpfallCommon.InEditor = false;
         UpfallCommon.Playtesting = false;
         UpfallCommon.CurrentWorldMode = WorldMode.Dark;
         PaletteSystem.ResetPalette();
-        ShaderEffectSystem.SetCircleRadius(0f);
+        ShaderEffectSystem.SetCircleRadiusAnim(0f, 0f);
         UpfallCommon.ResetPreviousLevelTextDisplayed();
+        UpfallCommon.ResetDeathCount();
+        UpfallCommon.LeaveLevelSet();
     }
 
     private MenuObject GetCurrentMenu()
@@ -81,6 +108,7 @@ public class MenuScene : Scene
             MenuState.OptionsMenu => _optionsMenu,
             MenuState.LevelSetSelect => _levelSetSelect,
             MenuState.LevelSelect => _levelSelect,
+            MenuState.LevelSetEnd => _levelSetEnd,
             _ => null,
         };
     }
@@ -138,9 +166,14 @@ public class MenuScene : Scene
         _currentMenu = MenuState.LevelSelect;
     }
 
+    private void LevelSetEnd(SpriteBatch spriteBatch)
+    {
+        _levelSetEndText.Draw(spriteBatch, UpfallCommon.ScreenCenter, Color.White, horizontalAlignment: TextHorizontalAlignment.Center);
+    }
+
     private void StartLevel()
     {
-        UpfallCommon.SetLevelSet(_detectedLevelSets[_selectedLevelSet], _selectedLevel);
+        UpfallCommon.SetLevelSet(_selectedLevelSet, _detectedLevelSets[_selectedLevelSet], _selectedLevel);
         SceneManager.Change("Game");
     }
 
@@ -154,5 +187,7 @@ public class MenuScene : Scene
         var font = _tinyUnicodeFont.GetFont(32);
         spriteBatch.DrawString(font, "v" + UpfallCommon.Version, Vector2.Zero, Color.White);
         GetCurrentMenu()?.Render(spriteBatch);
+        if (_currentMenu == MenuState.LevelSetEnd)
+            LevelSetEnd(spriteBatch);
     }
 }

@@ -68,6 +68,7 @@ internal class GameScene : Scene
         {
             // We're in-game, open pause menu to allow going back to main menu
             // TODO: make pause menu
+            UpfallCommon.LeaveLevelSet();
             SceneManager.Change("Menu");
             return;  // Don't execute further
         }
