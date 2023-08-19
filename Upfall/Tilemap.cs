@@ -164,13 +164,14 @@ public class Tilemap
     public Rectangle GetTileRect(int x, int y, TileType tileId, Direction direction)
     {
         const int spikeGap = 10;
+        const int spikeLeniency = 1;
         
         return tileId switch
         {
-            TileType.Spike when direction == Direction.Up => new (x * TileSize, y * TileSize + spikeGap, TileSize, TileSize - spikeGap),
-            TileType.Spike when direction == Direction.Down => new (x * TileSize, y * TileSize, TileSize, TileSize - spikeGap),
-            TileType.Spike when direction == Direction.Left => new (x * TileSize + spikeGap, y * TileSize, TileSize - spikeGap, TileSize),
-            TileType.Spike when direction == Direction.Right => new (x * TileSize, y * TileSize, TileSize - spikeGap, TileSize),
+            TileType.Spike when direction == Direction.Up => new (x * TileSize + spikeLeniency, y * TileSize + spikeGap + spikeLeniency, TileSize - spikeLeniency * 2, TileSize - spikeGap - spikeLeniency * 2),
+            TileType.Spike when direction == Direction.Down => new (x * TileSize + spikeLeniency, y * TileSize, TileSize - spikeLeniency * 2, TileSize - spikeGap - spikeLeniency * 2),
+            TileType.Spike when direction == Direction.Left => new (x * TileSize + spikeGap + spikeLeniency, y * TileSize + spikeLeniency, TileSize - spikeGap - spikeLeniency * 2, TileSize - spikeLeniency * 2),
+            TileType.Spike when direction == Direction.Right => new (x * TileSize + spikeLeniency, y * TileSize + spikeLeniency, TileSize - spikeGap - spikeLeniency * 2, TileSize - spikeLeniency * 2),
             TileType.Key => new (x * TileSize + 5, y * TileSize + 2, TileSize - 6, TileSize - 2),
             _ => new(x * TileSize, y * TileSize, TileSize, TileSize),
         };
@@ -586,6 +587,8 @@ public class Tilemap
 
             Rectangle? srcRect = tileId == TileType.Portal ? AnimationHelper.GetPortalSourceRectangle() : null;
             spriteBatch.Draw(tex, rect, srcRect, color, -rot, offset, SpriteEffects.None, 0f);
+            if (tileId == TileType.Spike)
+                spriteBatch.Draw(Assets.Pixel, GetTileRect(pos.X, pos.Y, tileId, direction), Color.Green * 1f);
         }
     }
 }
