@@ -118,15 +118,31 @@ public class EditScene : Scene
         _currentDirection = Direction.Up;
     }
 
-    private void RefreshEditor()
+    private void RefreshEditor(bool createTilemap = true)
     {
-        CreateBlankTilemap();
+        if (createTilemap)
+            CreateBlankTilemap();
         _simpleDarkCol = "000000";
         _simpleLightCol = "ffffff";
         _lerpDarkCol1 = "000000";
         _lerpDarkCol2 = "000000";
         _lerpLightCol1 = "ffffff";
         _lerpLightCol2 = "ffffff";
+        _currentPaletteType = _tilemap.LevelPalette.PaletteType;
+        
+        if (_tilemap.LevelPalette is SimplePalette simple)
+        {
+            _simpleDarkCol = ColorUtil.ColToHex(simple.DarkColor);
+            _simpleLightCol = ColorUtil.ColToHex(simple.LightColor);
+        }
+
+        if (_tilemap.LevelPalette is LerpPalette lerp)
+        {
+            _lerpDarkCol1 = ColorUtil.ColToHex(lerp.DarkColor1);
+            _lerpDarkCol2 = ColorUtil.ColToHex(lerp.DarkColor2);
+            _lerpLightCol1 = ColorUtil.ColToHex(lerp.LightColor1);
+            _lerpLightCol2 = ColorUtil.ColToHex(lerp.LightColor2);
+        }
         
         var menuSettings = new MenuSettings
         {
@@ -139,9 +155,9 @@ public class EditScene : Scene
         
         _editorMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
             .AddButton("Resume", _ => _showEditorMenu = false)
-            .AddTextInput("Level Name", "", (_, name) => _tilemap.LevelName = name)
-            .AddTextInput("Level Author", "", (_, name) => _tilemap.LevelAuthor = name)
-            .AddArraySelect("Level Palette Type", Enum.GetValues<PaletteType>(), 0, OnPaletteTypeChange)
+            .AddTextInput("Level Name", _tilemap.LevelName, (_, name) => _tilemap.LevelName = name)
+            .AddTextInput("Level Author", _tilemap.LevelAuthor, (_, name) => _tilemap.LevelAuthor = name)
+            .AddArraySelect("Level Palette Type", Enum.GetValues<PaletteType>(), (int)_currentPaletteType, OnPaletteTypeChange)
             .AddButton("Configure Palette", OnConfigurePalettePressed)
             .AddButton("Exit to Menu", _ =>
             {
@@ -151,17 +167,17 @@ public class EditScene : Scene
             .Build();
 
         _simplePaletteMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
-            .AddTextInput("Dark Color Hex Code", "000000", (_, str) => _simpleDarkCol = str)
-            .AddTextInput("Light Color Hex Code", "ffffff", (_, str) => _simpleLightCol = str)
+            .AddTextInput("Dark Color Hex Code", _simpleDarkCol, (_, str) => _simpleDarkCol = str)
+            .AddTextInput("Light Color Hex Code", _simpleLightCol, (_, str) => _simpleLightCol = str)
             .AddButton("Apply Changes", _ => CreateSimplePalette())
             .AddButton("Back", _ => _currentMenu = MenuState.Main)
             .Build();
 
         _lerpPaletteMenu = MenuBuilder.CreateMenu(openSans, UpfallCommon.ScreenCenter, menuSettings)
-            .AddTextInput("Dark Color 1 Hex Code", "000000", (_, str) => _lerpDarkCol1 = str)
-            .AddTextInput("Dark Color 2 Hex Code", "000000", (_, str) => _lerpDarkCol2 = str)
-            .AddTextInput("Light Color 1 Hex Code", "ffffff", (_, str) => _lerpLightCol1 = str)
-            .AddTextInput("Light Color 2 Hex Code", "ffffff", (_, str) => _lerpLightCol2 = str)
+            .AddTextInput("Dark Color 1 Hex Code", _lerpDarkCol1, (_, str) => _lerpDarkCol1 = str)
+            .AddTextInput("Dark Color 2 Hex Code", _lerpDarkCol2, (_, str) => _lerpDarkCol2 = str)
+            .AddTextInput("Light Color 1 Hex Code", _lerpLightCol1, (_, str) => _lerpLightCol1 = str)
+            .AddTextInput("Light Color 2 Hex Code", _lerpLightCol2, (_, str) => _lerpLightCol2 = str)
             .AddButton("Apply Changes", _ => CreateLerpPalette())
             .AddButton("Back", _ => _currentMenu = MenuState.Main)
             .Build();
@@ -274,15 +290,6 @@ public class EditScene : Scene
         return true;
     }
 
-    private void OpenLevel()
-    {
-        DialogResult res = Dialog.FileOpen("umd", UpfallCommon.CustomLevelsPath);
-        if (res.IsOk)
-        {
-            _levelFilename = res.Path;
-        }
-    }
-
     public override void Update(float dt)
     {
         if (InputManager.GetKeyPress(Keys.Escape))
@@ -341,6 +348,7 @@ public class EditScene : Scene
                     _tilemap = tilemap;
                     NotificationSystem.SendNotification("Loaded Level from " + res.Path);
                     _levelFilename = res.Path;
+                    RefreshEditor(false);
                 }
                 catch (IOException)
                 {
@@ -362,7 +370,7 @@ public class EditScene : Scene
 
             if (InputManager.GetKeyPress(Keys.N))
             {
-                RefreshEditor();
+                RefreshEditor(true);
                 NotificationSystem.SendNotification("Creating new level");
             }
         }
