@@ -1,1 +1,1 @@
-cd Brocco && git fetch && git pull && cd .. && git add Brocco
+cd Brocco && git fetch && git pull origin master && cd .. && git add Brocco
