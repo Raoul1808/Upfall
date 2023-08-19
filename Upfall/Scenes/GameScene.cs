@@ -56,7 +56,7 @@ internal class GameScene : Scene
     {
         AnimationHelper.UpdateFrames();
         ParticleSystem.UpdateParticles(dt);
-        bool quitting = InputManager.GetKeyPress(Keys.Escape);
+        bool quitting = InputManager.GetKeyPress(Keys.Escape) || InputManager.GetButtonPress(Buttons.Start);
         if (UpfallCommon.Playtesting && quitting)
         {
             // We're playtesting, go back to the editor
