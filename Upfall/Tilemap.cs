@@ -508,6 +508,7 @@ public class Tilemap
                 {
                     UpfallCommon.CycleWorldMode();
                     shouldCrossPortal = false;
+                    entity.ResetJump();
                 }
             }
         }

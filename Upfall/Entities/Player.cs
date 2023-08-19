@@ -106,8 +106,7 @@ public class Player : TilemapEntity
 
     private void OnLand()
     {
-        _canJump = true;
-        _isJumping = false;
+        ResetJump();
     }
 
     private void OnTouchCeiling()
@@ -160,5 +159,11 @@ public class Player : TilemapEntity
         ParticleSystem.SpawnDeathParticles(Position);
         Velocity = Vector2.Zero;
         Dispose();
+    }
+
+    public void ResetJump()
+    {
+        _canJump = true;
+        _isJumping = false;
     }
 }
