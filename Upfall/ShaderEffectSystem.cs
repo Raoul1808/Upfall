@@ -52,6 +52,8 @@ public class ShaderEffectSystem : BroccoAutoSystem
 
     public static void SetCircleRadius(float radius)
     {
+        _targetCircleSize = 0f;
+        _currentCircleSize = 0f;
         _shader.Parameters["CircleRadius"].SetValue(radius * _canvasRenderScale);
     }
 
