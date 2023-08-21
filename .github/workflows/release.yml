@@ -1,5 +1,7 @@
 name: Create Release
 
+on: workflow_dispatch
+
 jobs:
   release-windows:
     runs-on: windows-latest
