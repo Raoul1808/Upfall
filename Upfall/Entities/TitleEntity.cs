@@ -57,15 +57,16 @@ public class TitleEntity : Entity
     {
         const float phase = -MathHelper.Pi / 8f;
         const float speed = 2f;
-        const float strength = 8f;
+        const float strength = 12f;
+        const float letterOffset = 7f;
         _timer += dt;
         if (_timer > MathHelper.TwoPi)
             _timer -= MathHelper.TwoPi;
         float height = UpfallCommon.CanvasCenter.Y / 2f;
-        _posU.Y = strength * (float)Math.Sin(_timer * speed)  + height + 5f;
+        _posU.Y = strength * (float)Math.Sin(_timer * speed)  + height + letterOffset;
         _posP.Y = strength * (float)Math.Sin(_timer * speed + phase) + height;
         _posF.Y = strength * (float)Math.Sin(_timer * speed + phase * 2) + height;
-        _posA.Y = strength * (float)Math.Sin(_timer * speed + phase * 3) + height - 5f;
+        _posA.Y = strength * (float)Math.Sin(_timer * speed + phase * 3) + height - letterOffset;
         _posL1.Y = strength * (float)Math.Sin(_timer * speed + phase * 4) + height;
         _posL2.Y = strength * (float)Math.Sin(_timer * speed + phase * 5) + height;
     }
