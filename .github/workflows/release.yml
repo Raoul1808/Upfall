@@ -7,7 +7,7 @@ jobs:
     runs-on: windows-latest
     name: Create Windows Release
     steps:
-      - name: Checkout
+      - name: Checkout and Clone Submodules
         uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -17,18 +17,24 @@ jobs:
         with:
           dotnet-version: 7.0.x
       
-      - name: Build project
-        run: dotnet publish -r win-x64 -c Release
+      - name: Restore Projects
+        run: dotnet restore
         
-      - name: Copy dependencies
+      - name: Build FontStashSharp Release separately
+        run: dotnet publish -r win-x64 -c Release -f netstandard2.0 Brocco\FontStashSharp\src\XNA\FontStashSharp.FNA.Core.csproj
+      
+      - name: Build Upfall Release
+        run: dotnet publish -r win-x64 -c Release -f net7.0 Upfall\Upfall.csproj
+        
+      - name: Copy Dependencies
         run: copy "Brocco\deps\win-x64\*.*" "Upfall\bin\Release\net7.0\win-x64\publish"
         
-      - name: Compress artifacts
+      - name: Compress Artifacts
         run: |
           cd "Upfall\bin\Release\net7.0\win-x64
           tar -acvf upfall-win-x64.zip publish
       
-      - name: Upload artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: win-x64.zip
