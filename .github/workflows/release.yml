@@ -32,10 +32,10 @@ jobs:
       - name: Compress Artifacts
         run: |
           cd "Upfall\bin\Release\net7.0\win-x64"
-          tar -acvf upfall-win-x64.zip publish
+          tar -acvf ${{ github.workspace}}\win-x64.zip publish
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: win-x64.zip
-          path: ${{ github.workspace }}\Upfall\bin\Release\net7.0\win-x64\win-x64.zip
+          path: ${{ github.workspace }}\win-x64.zip
