@@ -9,11 +9,9 @@ jobs:
         include:
           - os: windows-latest
             rid: win-x64
-            tar-args: cvf
             artifact-name: win-x64.zip
           - os: ubuntu-latest
             rid: linux-x64
-            tar-args: czvf
             artifact-name: linux-x64.tar.gz
     
     name: Create ${{ matrix.rid }} Release
@@ -49,7 +47,7 @@ jobs:
       - name: Compress Artifacts
         run: |
           cd Upfall/bin/Release/net7.0/${{ matrix.rid }}/
-          tar -${{ matrix.tar-args }} ${{ github.workspace }}/${{ matrix.artifact-name }} publish
+          tar -acvf ${{ github.workspace }}/${{ matrix.artifact-name }} publish
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
