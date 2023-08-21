@@ -160,7 +160,11 @@ public class MenuScene : Scene
         _levelSelect = MenuBuilder.CreateMenu(_tinyUnicodeFont, UpfallCommon.ScreenCenter, _menuSettings)
             .AddArraySelect("Level", levels.ToArray(), action: (_, level) => _selectedLevel = levels.IndexOf(level))
             .AddButton("Play", _ => StartLevel())
-            .AddButton("Back", _ => _currentMenu = MenuState.LevelSetSelect)
+            .AddButton("Back", _ =>
+            {
+                _currentMenu = MenuState.LevelSetSelect;
+                _selectedLevel = 0;
+            })
             .Build();
 
         _currentMenu = MenuState.LevelSelect;
