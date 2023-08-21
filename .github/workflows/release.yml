@@ -3,15 +3,27 @@ name: Create Release
 on: workflow_dispatch
 
 jobs:
-  release-windows:
-    runs-on: windows-latest
-    name: Create Windows Release
+  build-release:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            tar-args: cvf
+            artifact-name: win-x64.zip
+          - os: ubuntu-latest
+            rid: linux-x64
+            tar-args: czvf
+            artifact-name: linux-x64.tar.gz
+    
+    name: Create ${{ matrix.rid }} Release
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout and Clone Submodules
         uses: actions/checkout@v3
         with:
           submodules: recursive
-        
+      
       - name: Setup .NET 7
         uses: actions/setup-dotnet@v3
         with:
@@ -19,23 +31,28 @@ jobs:
       
       - name: Restore Projects
         run: dotnet restore
-        
-      - name: Build FontStashSharp Release separately
-        run: dotnet publish -r win-x64 -c Release -f netstandard2.0 Brocco\FontStashSharp\src\XNA\FontStashSharp.FNA.Core.csproj
+      
+      - name: Build FontStashSharp
+        run: dotnet publish -r ${{ matrix.rid }} -c Release -f netstandard2.0 Brocco/FontStashSharp/src/XNA/FontStashSharp.FNA.Core.csproj
       
       - name: Build Upfall Release
-        run: dotnet publish -r win-x64 -c Release -f net7.0 Upfall\Upfall.csproj
-        
-      - name: Copy Dependencies
-        run: copy "Brocco\deps\win-x64\*.*" "Upfall\bin\Release\net7.0\win-x64\publish"
-        
+        run: dotnet publish -r ${{matrix.rid }} -c Release -f net7.0 Upfall/Upfall.csproj
+      
+      - name: Copy Windows Runtime Dependencies
+        if: ${{ matrix.rid == 'win-x64' }}
+        run: copy "Brocco\deps\win-x64\*.*" "Upfall\bin\Release\net7.0\win-x64\publish\"
+      
+      - name: Copy Linux Runtime Dependencies
+        if: ${{ matrix.rid == 'linux-x64' }}
+        run: cp -r Brocco/deps/linux-x64/. Upfall/bin/Release/net7.0/linux-x64/publish/
+      
       - name: Compress Artifacts
         run: |
-          cd "Upfall\bin\Release\net7.0\win-x64"
-          tar -acvf ${{ github.workspace}}\win-x64.zip publish
+          cd Upfall/bin/Release/net7.0/${{ matrix.rid }}/
+          tar -${{ matrix.tar-args }} ${{ github.workspace }}/${{ matrix.artifact-name }} publish
       
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: win-x64.zip
-          path: ${{ github.workspace }}\win-x64.zip
+          name: ${{ matrix.artifact-name }}
+          path: ${{ github.workspace }}/${{ matrix.artifact-name }}
