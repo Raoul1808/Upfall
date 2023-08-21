@@ -31,7 +31,7 @@ jobs:
         
       - name: Compress Artifacts
         run: |
-          cd "Upfall\bin\Release\net7.0\win-x64
+          cd "Upfall\bin\Release\net7.0\win-x64"
           tar -acvf upfall-win-x64.zip publish
       
       - name: Upload Artifacts
