@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using Brocco;
 using Brocco.Basic;
@@ -20,6 +21,8 @@ public class EditScene : Scene
         SimplePalette,
         LerpPalette,
     }
+
+    private const string EditorWikiUri = "https://github.com/Raoul1808/Upfall/wiki/Using-the-Level-Editor";
     
     private Tilemap _tilemap;
     private Size _tilemapSize;
@@ -110,7 +113,10 @@ public class EditScene : Scene
     {
         PaletteSystem.ResetPalette(0f);
         if (!UpfallCommon.Playtesting)
+        {
+            NotificationSystem.SendNotification("Press Escape to open the editor menu");
             RefreshEditor();
+        }
         UpfallCommon.CurrentWorldMode = WorldMode.Common;
         UpfallCommon.InEditor = true;
         UpfallCommon.Playtesting = false;
@@ -159,6 +165,7 @@ public class EditScene : Scene
             .AddTextInput("Level Author", _tilemap.LevelAuthor, (_, name) => _tilemap.LevelAuthor = name)
             .AddArraySelect("Level Palette Type", Enum.GetValues<PaletteType>(), (int)_currentPaletteType, OnPaletteTypeChange)
             .AddButton("Configure Palette", OnConfigurePalettePressed)
+            .AddButton("Open Editor Guide Wiki Page", _ => Process.Start(new ProcessStartInfo(EditorWikiUri) {UseShellExecute = true}))
             .AddButton("Exit to Menu", _ =>
             {
                 _showEditorMenu = false;
