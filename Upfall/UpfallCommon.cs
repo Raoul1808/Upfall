@@ -9,10 +9,10 @@ namespace Upfall;
 public static class UpfallCommon
 {
     #if DEBUG
-    public const string Version = "1.0.0-DEBUG";
+    public const string Version = "1.0.1-DEBUG";
     public const string ShortVersion = "1.0-DEBUG";
     #else
-    public const string Version = "1.0.0";
+    public const string Version = "1.0.1";
     public const string ShortVersion = "1.0";
     #endif
     
