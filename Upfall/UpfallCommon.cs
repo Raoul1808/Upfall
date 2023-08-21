@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Brocco;
 using Microsoft.Xna.Framework;
 
 namespace Upfall;
@@ -48,9 +47,6 @@ public static class UpfallCommon
 
     public static readonly string GamePath = Directory.GetParent(Assembly.GetExecutingAssembly().Location)?.FullName ?? "";
     public static readonly string LevelsPath = Path.Join(GamePath, "Content", "Levels");
-    public static readonly string CustomLevelsPath = Path.Join(LevelsPath, "Levels");
-
-    public static readonly string TilesPath = Path.Join(GamePath, "Content", "Maps");
 
     public static Vector2 ScreenCenter;
     public static Vector2 CanvasCenter;

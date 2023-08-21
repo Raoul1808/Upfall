@@ -7,11 +7,11 @@ namespace Upfall.Entities;
 
 public class TitleEntity : Entity
 {
-    private Texture2D _letterU;
-    private Texture2D _letterP;
-    private Texture2D _letterF;
-    private Texture2D _letterA;
-    private Texture2D _letterL;
+    private readonly Texture2D _letterU;
+    private readonly Texture2D _letterP;
+    private readonly Texture2D _letterF;
+    private readonly Texture2D _letterA;
+    private readonly Texture2D _letterL;
 
     private Vector2 _posU;
     private Vector2 _posP;
@@ -20,7 +20,7 @@ public class TitleEntity : Entity
     private Vector2 _posL1;
     private Vector2 _posL2;
 
-    private Vector2 _globalOffset;
+    private readonly Vector2 _globalOffset;
     
     private float _timer;
 

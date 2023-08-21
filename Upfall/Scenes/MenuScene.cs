@@ -35,7 +35,7 @@ public class MenuScene : Scene
 
     private FontSystem _tinyUnicodeFont;
 
-    private MenuSettings _menuSettings = new MenuSettings
+    private readonly MenuSettings _menuSettings = new()
     {
         FontSize = 64f,
         SelectEffect = MenuSelectEffect.Underline,

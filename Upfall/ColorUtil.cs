@@ -19,9 +19,9 @@ public static class ColorUtil
         HsvToRgb(h, s, v, out r, out g, out b);
 
 
-        color.R = (byte)(r);
-        color.G = (byte)(g);
-        color.B = (byte)(b);
+        color.R = (byte)r;
+        color.G = (byte)g;
+        color.B = (byte)b;
 
         hue = h;
     }
@@ -29,8 +29,8 @@ public static class ColorUtil
     static void RgbToHsv(float r, float g, float b, out float h, out float s, out float v)
     {
         float min, max, delta;
-        min = System.Math.Min(System.Math.Min(r, g), b);
-        max = System.Math.Max(System.Math.Max(r, g), b);
+        min = Math.Min(Math.Min(r, g), b);
+        max = Math.Max(Math.Max(r, g), b);
         v = max; // v
         delta = max - min;
         if (max != 0)
@@ -59,7 +59,7 @@ public static class ColorUtil
     static void HsvToRgb(float h, float s, float v, out float r, out float g, out float b)
     {
         // Keeps h from going over 360
-        h = h - ((int)(h / 360) * 360);
+        h -= (int)(h / 360) * 360;
 
         int i;
         float f, p, q, t;

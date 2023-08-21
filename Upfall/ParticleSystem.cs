@@ -18,7 +18,7 @@ public static class ParticleSystem
 
     private static float _deathParticleTimer = 0f;
 
-    private static Random _random = new Random();
+    private static Random _random = new();
     
     private static List<Particle> _particles = new();
 

@@ -26,7 +26,7 @@ public class SplashScene : Scene
                                        "Press Enter/A to continue";
         
         _font = Assets.GetFontSystem("Open Sans");
-        _epilepsyText = new RichTextLayout()
+        _epilepsyText = new RichTextLayout
         {
             Text = epilepsyWarning,
             Font = _font.GetFont(48),
@@ -42,7 +42,6 @@ public class SplashScene : Scene
 
     public override void ScreenRender(SpriteBatch spriteBatch)
     {
-        var font = _font.GetFont(32);
         var pos = new Vector2(UpfallCommon.ScreenCenter.X, 100f);
         _epilepsyText.Draw(spriteBatch, pos, Color.White, horizontalAlignment: TextHorizontalAlignment.Center);
         base.ScreenRender(spriteBatch);

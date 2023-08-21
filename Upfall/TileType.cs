@@ -1,4 +1,3 @@
-using System;
 using Brocco;
 using Microsoft.Xna.Framework.Graphics;
 
